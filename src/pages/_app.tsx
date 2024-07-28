@@ -1,20 +1,25 @@
-import "@/styles/globals.css";
-import { Layout, Slider } from "antd";
-import type { AppProps } from "next/app";
+/** @format */
 
-const {Header, Sider, Content} = Layout;
+import { HeaderComponent, SiderComponent } from '@/components';
+import { Layout } from 'antd';
+import type { AppProps } from 'next/app';
+
+const { Header, Content } = Layout;
+
 export default function App({ Component, pageProps }: AppProps) {
-  return 
-  <Layout>
-    <Header/>
-   <Layout>
-   <Slider />
-    <Content>
-      <div className="container-fuild bg-white"></div>
-      <div className="container p-4"></div>
-    <Component {...pageProps} />
-    </Content>
-   </Layout>
-  </Layout>
-  ;
+	return (
+		<Layout>
+			<HeaderComponent />
+			<Layout>
+				<SiderComponent />
+				<Content>
+					<div className='container-fuild '>
+						<div className='container p-4'>
+							<Component {...pageProps} />
+						</div>
+					</div>
+				</Content>
+			</Layout>
+		</Layout>
+	);
 }
