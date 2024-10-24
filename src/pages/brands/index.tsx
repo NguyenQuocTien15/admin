@@ -6,12 +6,17 @@ import AvatarComponent from "@/components/AvatarComponent";
 import { fs } from "@/firebase/firabaseConfig";
 import { AddNewBrand } from "@/modals";
 import { BrandModel } from "@/models/BrandModel";
-import { Button, Table } from "antd";
+import { Button, Space, Table, Tooltip } from "antd";
 import { ColumnProps } from "antd/es/table";
 import { collection, onSnapshot } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
+import { FaEdit } from "react-icons/fa";
+import { useRouter } from "next/router";
+import { FcAddImage, FcDeleteColumn } from "react-icons/fc";
+import { DeleteOutlined } from "@ant-design/icons";
 
 const Brands = () => {
+  const router = useRouter();
   const [isVisibleModalAddBrands, setIsVisibleModalAddBrands] = useState(false);
   const [brands, setBrands] = useState<BrandModel[]>([]);
 
@@ -52,6 +57,33 @@ const Brands = () => {
       title: "Brands name",
       key: "title",
       dataIndex: "title",
+    },
+    {
+      title: "Action",
+      align: "right",
+      dataIndex: "",
+      render: (item) => (
+        <Space>
+          <Tooltip title="Edit brand">
+            <Button
+              type="text"
+              icon={<FaEdit color="green" size={20} />}
+              onClick={() =>
+                router.push(``)
+              }
+            />
+          </Tooltip>
+          <Tooltip title="Delete brand">
+            <Button
+              type="text"
+              icon={<DeleteOutlined size={20} style={{color:'red'}} />}
+              onClick={() =>
+                router.push(``)
+              }
+            />
+          </Tooltip>
+        </Space>
+      ),
     },
   ];
 

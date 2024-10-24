@@ -22,6 +22,7 @@ const AddNewProduct = () => {
 	const [files, setFiles] = useState<any[]>([]);
 	const [imgUrl, setImgUrl] = useState('');
 	const [categories, setCategories] = useState<any[]>([]);
+	const [brands, setBrands] = useState<any[]>([]);
 	const [isVisibleModalAddCategory, setIsVisibleModalAddCategory] =
 		useState(false);
 
@@ -36,6 +37,9 @@ const AddNewProduct = () => {
 	useEffect(() => {
 		getCategories();
 	}, []);
+	useEffect(() => {
+    getBrands();
+  }, []);
 
 	const getProductDetail = async (id: string) => {
 		try {
@@ -110,94 +114,119 @@ const AddNewProduct = () => {
 			}
 		});
 	};
+const getBrands = () => {
+  onSnapshot(collection(fs, "brands"), (snap) => {
+    if (snap.empty) {
+      console.log("Data not found!");
+      setBrands([]);
+    } else {
+      const items: any[] = [];
 
+      snap.forEach((item: any) => {
+        items.push({
+          value: item.id,
+          label: item.data().title,
+        });
+      });
+
+      setBrands(items);
+    }
+  });
+};
 	return (
-		<div>
-			<HeadComponent
-				title='Add new product'
-				pageTitle='Add new product'
-				extra={
-					<Button
-						type='primary'
-						onClick={() => setIsVisibleModalAddCategory(true)}
-						icon={<BiAddToQueue size={22} />}>
-						Add new category
-					</Button>
-				}
-			/>
-			<div className='col-md-8 offset-md-2'>
-				<Card title='Form add new'>
-					<Form
-						disabled={isLoading}
-						size='large'
-						form={form}
-						layout='vertical'
-						onFinish={handleAddNewProduct}>
-						<Form.Item
-							name={'title'}
-							label='Title'
-							rules={[
-								{
-									required: true,
-									message: 'What is products title',
-								},
-							]}>
-							<Input placeholder='Title' maxLength={150} allowClear />
-						</Form.Item>
-						<Form.Item name={'type'} label='Type'>
-							<Input />
-						</Form.Item>
-						<Form.Item name={'categories'} label='Categories'>
-							<Select mode='multiple' options={categories} />
-						</Form.Item>
-						<Form.Item name={'description'} label='Description'>
-							<Input.TextArea rows={3} />
-						</Form.Item>
-						<Form.Item name={'price'} label='Price'>
-							<Input type='number' />
-						</Form.Item>
-					</Form>
+    <div>
+      <HeadComponent
+        title="Add new product"
+        pageTitle="Add new product"
+        extra={
+          <Button
+            type="primary"
+            onClick={() => setIsVisibleModalAddCategory(true)}
+            icon={<BiAddToQueue size={22} />}
+          >
+            Add new category
+          </Button>
+        }
+      />
+      <div className="col-md-8 offset-md-2">
+        <Card title="Form add new">
+          <Form
+            disabled={isLoading}
+            size="large"
+            form={form}
+            layout="vertical"
+            onFinish={handleAddNewProduct}
+          >
+            <Form.Item
+              name={"title"}
+              label="Title"
+              rules={[
+                {
+                  required: true,
+                  message: "What is products title",
+                },
+              ]}
+            >
+              <Input placeholder="Title" maxLength={150} allowClear />
+            </Form.Item>
+            <Form.Item name={"type"} label="Type">
+              <Input />
+            </Form.Item>
+            <Form.Item name={"categories"} label="Categories">
+              <Select mode="multiple" options={categories} />
+            </Form.Item>
+            <Form.Item name={"brands"} label="Brands">
+              <Select options={brands} />
+            </Form.Item>
+            <Form.Item name={"description"} label="Description">
+              <Input.TextArea rows={3} />
+            </Form.Item>
+            <Form.Item name={"price"} label="Price">
+              <Input type="number" />
+            </Form.Item>
+          </Form>
 
-					{files.length > 0 && (
-						<div>
-							<img
-								src={URL.createObjectURL(files[0])}
-								style={{
-									width: 200,
-									height: 'auto',
-								}}
-								alt=''
-							/>
-						</div>
-					)}
+          {files.length > 0 && (
+            <div>
+              <img
+                src={URL.createObjectURL(files[0])}
+                style={{
+                  width: 200,
+                  height: "auto",
+                }}
+                alt=""
+              />
+            </div>
+          )}
 
-					{files.length === 0 && imgUrl ? (
-						<Image src={imgUrl} style={{ width: 200 }} />
-					) : (
-						<></>
-					)}
-					<ImagePicker
-						loading={isLoading}
-						onSelected={(vals) => setFiles(vals)}
-					/>
+          {files.length === 0 && imgUrl ? (
+            <Image src={imgUrl} style={{ width: 200 }} />
+          ) : (
+            <></>
+          )}
+          <ImagePicker
+            loading={isLoading}
+            onSelected={(vals) => setFiles(vals)}
+          />
 
-					<div className='mt-3 text-right'>
-						<Button
-							loading={isLoading}
-							onClick={() => form.submit()}
-							type='primary'>
-							Publish
-						</Button>
-					</div>
-				</Card>
-			</div>
+          <div className="mt-3 text-right">
+            <Button
+              loading={isLoading}
+              onClick={() => form.submit()}
+              type="primary"
+            >
+              Publish
+            </Button>
+          </div>
+        </Card>
+      </div>
 
-			<AddNewCategory
-				visible={isVisibleModalAddCategory}
-				onClose={() => setIsVisibleModalAddCategory(false)}
-			/>
-		</div>
-	);
+      <AddNewCategory
+        visible={isVisibleModalAddCategory}
+        onClose={() => setIsVisibleModalAddCategory(false)}
+      />
+    </div>
+  );
 };
 
 export default AddNewProduct;
