@@ -7,4 +7,5 @@ export interface ProductModel {
   imageUrl: string;
   files: string[];
   categories: string[];
+  brands: string;
 }
