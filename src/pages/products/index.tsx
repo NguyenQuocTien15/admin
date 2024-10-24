@@ -91,19 +91,17 @@ const Products = () => {
       key: "brand",
       title: "Brands",
       dataIndex: "brands",
-      render: (brands) => {
-        if (Array.isArray(brands) && brands.length > 0) {
-          return (
-            <Space>
-              {brands.map((id) => (
-                <BrandComponent key={id} id={id} />
-              ))}
-            </Space>
-          );
-        } else {
-          return <span>No brands associated</span>;
-        }
-      },
+    //   render: (ids: string[]) =>
+    //     ids &&
+    //     ids.length > 0 && (
+    //       <Space>
+    //         {ids.map((id) => (
+    //           <Tag>
+    //             <BrandComponent id={id} key={id} />
+    //           </Tag>
+    //         ))}
+    //       </Space>
+    //     ),
     },
 
     {
