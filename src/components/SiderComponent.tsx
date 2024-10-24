@@ -10,7 +10,7 @@ import { FaRegEnvelope } from 'react-icons/fa'
 import { FaPercentage } from 'react-icons/fa';
 import { IoMdPricetag } from 'react-icons/io';
 import { AiOutlineBarChart } from 'react-icons/ai';
-import { SkinOutlined } from '@ant-design/icons';
+import { SkinOutlined, UserAddOutlined } from '@ant-design/icons';
 
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -32,6 +32,11 @@ const SiderComponent = () => {
       key: "users",
       label: <Link href={"/users"}>Users</Link>,
       icon: <BiUser />,
+    },
+    {
+      key: "shippers",
+      label: <Link href={"/shippers"}>Shippers</Link>,
+      icon: <UserAddOutlined />,
     },
     {
       key: "messengeruser",

@@ -6,7 +6,7 @@ import React from 'react'
 const OrderManagements = () => {
     const router = useRouter();
   return (
-    <div>
+   
       <div>
         <HeadComponent
           title="Delivery"
@@ -21,7 +21,7 @@ const OrderManagements = () => {
           }
         />
       </div>
-    </div>
+    
   );
 }
 
