@@ -16,14 +16,13 @@ const Shippers = () => {
         extra={
           <Button
             type="primary"
-            onClick={() => setIsVisibleModalNewShipper(true)}
+            onClick={() => router.push(`/shippers/add-shipper`)}
           >
             Add Shipper
           </Button>
         }
       />
-      <AddNewShipper visible={isVisibleModalNewShipper}
-      onClose={()=> setIsVisibleModalNewShipper(false)}></AddNewShipper>
+    
     </div>
   );
 };
