@@ -1,24 +1,25 @@
 /** @format */
 
 import { HeadComponent } from "@/components";
+import AvatarComponent from "@/components/AvatarComponent";
+
 import { fs } from "@/firebase/firabaseConfig";
 import { AddNewBrand } from "@/modals";
 import { BrandModel } from "@/models/BrandModel";
 import { Button, Table } from "antd";
 import { ColumnProps } from "antd/es/table";
 import { collection, onSnapshot } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const Brands = () => {
-  const [isVisibleModalAddBrand, setIsVisibleModalAddBrand] =
-    useState(false);
-  const [categories, setCategories] = useState<BrandModel[]>([]);
+  const [isVisibleModalAddBrands, setIsVisibleModalAddBrands] = useState(false);
+  const [brands, setBrands] = useState<BrandModel[]>([]);
 
   useEffect(() => {
     onSnapshot(collection(fs, "brands"), (snap) => {
       if (snap.empty) {
         console.log("Data not found!");
-        setCategories([]);
+        setBrands([]);
       } else {
         const items: BrandModel[] = [];
 
@@ -29,13 +30,26 @@ const Brands = () => {
           });
         });
 
-        setCategories(items);
+        setBrands(items);
       }
     });
   }, []);
 
   const columns: ColumnProps<BrandModel>[] = [
     {
+      title: "Brands Image",
+      key: "img",
+      dataIndex: "",
+      render: (item: BrandModel) => (
+        <AvatarComponent
+          imageUrl={item.imageUrl}
+          id={item.files && item.files.length > 0 ? item.files[0] : undefined}
+          path="files"
+        />
+      ),
+    },
+    {
+      title: "Brands name",
       key: "title",
       dataIndex: "title",
     },
@@ -49,15 +63,16 @@ const Brands = () => {
         extra={
           <Button
             type="primary"
-            onClick={() => setIsVisibleModalAddBrand(true)}
+            onClick={() => setIsVisibleModalAddBrands(true)}
           >
             Add new
           </Button>
         }
       />
+      <Table dataSource={brands} columns={columns} />
       <AddNewBrand
-        visible={isVisibleModalAddBrand}
-        onClose={() => setIsVisibleModalAddBrand(false)}
+        visible={isVisibleModalAddBrands}
+        onClose={() => setIsVisibleModalAddBrands(false)}
       />
     </div>
   );
