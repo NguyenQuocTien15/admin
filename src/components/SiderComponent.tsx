@@ -60,7 +60,7 @@ const SiderComponent = () => {
     },
     {
       key: "statistics",
-      label: <Link href={"/statistics"}>Statistics</Link>,
+      label: <Link href={"/"}>Statistics</Link>,
       icon: <AiOutlineBarChart />,
     },
   ];

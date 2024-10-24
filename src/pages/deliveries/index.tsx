@@ -1,11 +1,26 @@
+import { HeadComponent } from '@/components';
+import { Button } from 'antd';
+import { useRouter } from 'next/router';
 import React from 'react'
 
-const Delivery = () => {
+const NewOrders = () => {
+  const router = useRouter();
   return (
     <div>
-      Delivery
+      <HeadComponent
+        title="Delivery"
+        pageTitle="New Order"
+        extra={
+          <Button
+            type="primary"
+            onClick={()=>router.push(`/deliveries/order-management`)}
+          >
+            Order Management
+          </Button>
+        }
+      />
     </div>
-  )
+  );
 }
 
-export default Delivery
+export default NewOrders
