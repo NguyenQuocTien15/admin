@@ -42,22 +42,22 @@ const Categories = () => {
 	}, []);
 
 	const columns: ColumnProps<CategoryModel>[] = [
-		{
-			key: 'img',
-			dataIndex: '',
-			render: (item: CategoryModel) => (
-				<AvatarComponent
-					imageUrl={item.imageUrl}
-					id={item.files && item.files.length > 0 ? item.files[0] : undefined}
-					path='files'
-				/>
-			),
-		},
-		{
-			key: 'title',
-			dataIndex: 'title',
-		},
-	];
+    {
+      key: "img",
+      dataIndex: "",
+      render: (item: CategoryModel) => (
+        <AvatarComponent
+          imageUrl={item.imageUrl}
+          id={item.files && item.files.length > 0 ? item.files[0] : undefined}
+          path="files"
+        />
+      ),
+    },
+    {
+      key: "title",
+      dataIndex: "title",
+    },
+  ];
 
 	return (
 		<div>

@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -16,6 +16,6 @@ console.log(process.env.NEXT_PUBLIC_apiKey);
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth();
-auth.languageCode = 'vi';
+auth.languageCode = "vi";
 export const fs = getFirestore();
 export const storage = getStorage();
