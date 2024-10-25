@@ -1,15 +1,16 @@
 import { HeadComponent, ImagePicker } from "@/components";
-import { Button, Input } from "antd";
+import { Button, Input, Image, Alert, Upload } from "antd";
 import React, { useState } from "react";
 import { useRouter } from "next/router";
-type Props = {
-  visible: boolean;
-  onClose: () => void;
-};
-const AddShippers = (props: Props) => {
-  const router = useRouter();
-  const { visible, onClose } = props;
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { auth, fs, storage } from "@/firebase/firabaseConfig";
+import { UploadOutlined } from "@ant-design/icons";
 
+
+const AddShippers = () => {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -17,170 +18,178 @@ const AddShippers = (props: Props) => {
   const [password, setPassword] = useState("");
   const [CIN, setCIN] = useState("");
   const [dateOfIssuance, setDateOfIssuance] = useState("");
-  const [filesAvatar, setFilesAvatar] = useState<any[]>([]);
-  const [filesFront, setFilesFront] = useState<any[]>([]);
-  const [filesBack, setFilesBack] = useState<any[]>([]);
+  const [filesAvatar, setFilesAvatar] = useState<File[]>([]);
+  const [filesFront, setFilesFront] = useState<File[]>([]);
+  const [filesBack, setFilesBack] = useState<File[]>([]);
+  const handleSaveShipper = async () => {
+    setIsLoading(true);
+    try {
+      // Tạo tài khoản với email và password
+      const shipperCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const shipper = shipperCredential.user;
 
-  const handleClose = () => {
-    setFullName("");
-    setFilesFront([]);
-    onClose();
+      const avatarRef = ref(storage, `avatars/${shipper.uid}`);
+      await uploadBytes(avatarRef, filesAvatar[0]);
+      const avatarUrl = await getDownloadURL(avatarRef); // Fixed
+
+      const frontRef = ref(storage, `cccd/front/${shipper.uid}`);
+      await uploadBytes(frontRef, filesFront[0]);
+      const frontUrl = await getDownloadURL(frontRef); // Fixed
+
+      const backRef = ref(storage, `cccd/back/${shipper.uid}`);
+      await uploadBytes(backRef, filesBack[0]);
+      const backUrl = await getDownloadURL(backRef); // Fixed
+
+      // Lưu thông tin người dùng vào Firestore
+      await setDoc(doc(fs, "shippers", shipper.uid), {
+        fullName,
+        email,
+        phoneNumber,
+        CIN,
+        DateOfIssuance: new Date(dateOfIssuance),
+        avatar: avatarUrl,
+        image_CCCD_card_front: frontUrl,
+        image_CCCD_card_back: backUrl,
+        files_card_front: filesFront.map((file) => file.name),
+        files_card_back: filesBack.map((file) => file.name),
+      });
+
+      alert("Shipper created successfully!");
+      router.push("/shippers");
+    } catch (error) {
+      console.error("Error adding shipper: ", error);
+      alert(`Failed to save shipper: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
-  const handleAddNewShipper = () => {};
   return (
-    <div className="ml-5 mr-5">
-      <div>
-        <HeadComponent
-          title="Shipper"
-          pageTitle="Add Shipper"
-          extra={
-            <Button type="primary" onClick={() => router.back()}>
-              Back
-            </Button>
-          }
+    <div className="form-fluid">
+      <h2>Register New User</h2>
+
+      {/* Full name input */}
+      <div className="input-group">
+        <label>Full Name</label>
+        <Input
+          placeholder="Enter full name"
+          value={fullName}
+          onChange={(e) => setFullName(e.target.value)}
         />
       </div>
-      <div className="mb-3 mt-3">
-        <div className="mt-3">
-          {" "}
-          <div className="mt-1 mb-1">Full name</div>
-          <Input
-            size="large"
-            placeholder="Enter full name"
-            maxLength={150}
-            showCount
-            allowClear
-            value={fullName}
-            onChange={(val) => setFullName(val.target.value)}
-          />
-        </div>
-        <div className="mt-3">
-          <div className="mt-1 mb-1">Email</div>
-          <Input
-            size="large"
-            placeholder="Enter email"
-            maxLength={150}
-            showCount
-            allowClear
-            value={email}
-            onChange={(val) => setEmail(val.target.value)}
-          />
-        </div>
-        <div className="mt-3">
-          <div className="mt-1 mb-1">Phone number</div>
-          <Input
-            size="large"
-            placeholder="Enter phone number"
-            maxLength={10}
-            showCount
-            allowClear
-            value={phoneNumber}
-            onChange={(val) => setPhoneNumber(val.target.value)}
-          />
-        </div>
-        <div className="mt-3">
-          <div className="mt-1 mb-1">Password</div>
-          <Input
-            size="large"
-            placeholder="Enter password"
-            maxLength={150}
-            showCount
-            allowClear
-            value={password}
-            onChange={(val) => setPassword(val.target.value)}
-          />
-        </div>
-        <div className="mt-3">
-          <div className="mt-1 mb-1">Avatar</div>
-          {filesAvatar.length > 0 && (
-            <div className="mt-1">
-              <img
-                src={URL.createObjectURL(filesAvatar[0])}
-                style={{
-                  width: 200,
-                  height: "auto",
-                }}
-                alt=""
-              />
-            </div>
-          )}
-          <ImagePicker
-            loading={isLoading}
-            onSelected={(vals) => setFilesAvatar(vals)}
-          />
-        </div>
-        <div className="mt-3">
-          <div className="mt-1 mb-1">Citizen identification number</div>
-          <Input
-            size="large"
-            placeholder="Enter citizen identification number"
-            maxLength={12}
-            showCount
-            allowClear
-            value={CIN}
-            onChange={(val) => setCIN(val.target.value)}
-          />
-        </div>
-        <div className="mt-3">
-          <div className="mt-1 mb-1">Date of issuance</div>
-          <Input
-            size="large"
-            placeholder="Enter date of issuance"
-            maxLength={12}
-            showCount
-            allowClear
-            value={dateOfIssuance}
-            onChange={(val) => setDateOfIssuance(val.target.value)}
-          />
-        </div>
-        <div className="mt-3">
-          <div className="mt-1 mb-1">
-            The front of the citizen identification card
-          </div>
-          {filesFront.length > 0 && (
-            <div className="mt-1">
-              <img
-                src={URL.createObjectURL(filesFront[0])}
-                style={{
-                  width: 200,
-                  height: "auto",
-                }}
-                alt=""
-              />
-            </div>
-          )}
-          <ImagePicker
-            loading={isLoading}
-            onSelected={(vals) => setFilesFront(vals)}
-          />
-        </div>
-        <div className="mt-3">
-          <div className="mt-1 mb-1">
-            The back of the citizen identification card
-          </div>
-          {filesBack.length > 0 && (
-            <div className="mt-1">
-              <img
-                src={URL.createObjectURL(filesBack[0])}
-                style={{
-                  width: 200,
-                  height: "auto",
-                }}
-                alt=""
-              />
-            </div>
-          )}
-          <ImagePicker
-            loading={isLoading}
-            onSelected={(vals) => setFilesBack(vals)}
-          />
-        </div>
-        <div className="d-flex justify-content-end mt-3">
-          <button className="btn btn-primary">Save</button>
-        </div>
+
+      {/* Email input */}
+      <div className="input-group">
+        <label>Email</label>
+        <Input
+          type="email"
+          placeholder="Enter email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+        />
       </div>
+
+      {/* Phone number input */}
+      <div className="input-group">
+        <label>Phone Number</label>
+        <Input
+          placeholder="Enter phone number"
+          value={phoneNumber}
+          onChange={(e) => setPhoneNumber(e.target.value)}
+        />
+      </div>
+
+      {/* Password input */}
+      <div className="input-group">
+        <label>Password</label>
+        <Input
+          type="password"
+          placeholder="Enter password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+      </div>
+
+      {/* CIN input */}
+      <div className="input-group">
+        <label>Citizen Identification Number (CIN)</label>
+        <Input
+          placeholder="Enter CIN"
+          value={CIN}
+          onChange={(e) => setCIN(e.target.value)}
+        />
+      </div>
+
+      {/* Date of Issuance input */}
+      <div className="input-group">
+        <label>Date of Issuance</label>
+        <Input
+          type="date"
+          placeholder="Select date of issuance"
+          value={dateOfIssuance}
+          onChange={(e) => setDateOfIssuance(e.target.value)}
+        />
+      </div>
+
+      {/* Upload Avatar */}
+      <div className="input-group">
+        <label>Upload Avatar</label>
+        <Upload
+          beforeUpload={(file) => {
+            setFilesAvatar([file]);
+            return false; // Prevent automatic upload
+          }}
+        >
+          <Button icon={<UploadOutlined />}>Select Avatar</Button>
+        </Upload>
+        {filesAvatar.length > 0 && (
+          <p>Selected Avatar: {filesAvatar[0].name}</p>
+        )}
+      </div>
+
+      {/* Upload Front of CIN */}
+      <div className="input-group">
+        <label>Upload Front of CIN</label>
+        <Upload
+          beforeUpload={(file) => {
+            setFilesFront([file]);
+            return false;
+          }}
+        >
+          <Button icon={<UploadOutlined />}>Select Front of CIN</Button>
+        </Upload>
+        {filesFront.length > 0 && <p>Selected File: {filesFront[0].name}</p>}
+      </div>
+
+      {/* Upload Back of CIN */}
+      <div className="input-group">
+        <label>Upload Back of CIN</label>
+        <Upload
+          beforeUpload={(file) => {
+            setFilesBack([file]);
+            return false;
+          }}
+        >
+          <Button icon={<UploadOutlined />}>Select Back of CIN</Button>
+        </Upload>
+        {filesBack.length > 0 && <p>Selected File: {filesBack[0].name}</p>}
+      </div>
+
+      {/* Submit Button */}
+      <Button
+        type="primary"
+        loading={isLoading}
+        onClick={handleSaveShipper}
+        style={{ marginTop: "20px" }}
+      >
+        Save
+      </Button>
     </div>
   );
 };
+
 
 export default AddShippers;
