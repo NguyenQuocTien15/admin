@@ -32,6 +32,7 @@ const Users = () => {
 	}, []);
 
 	const columns: ColumnProps<UserModel>[] = [
+	
 		{
 			key: 'Name',
 			dataIndex: 'displayName',

@@ -17,5 +17,5 @@ console.log(process.env.NEXT_PUBLIC_apiKey);
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth();
 auth.languageCode = "vi";
-export const fs = getFirestore();
+export const fs = getFirestore(app);
 export const storage = getStorage();
