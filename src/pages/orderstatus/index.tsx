@@ -28,6 +28,10 @@ const OrderStatus = () => {
               ...item.data(),
             });
           });
+          items.sort((a, b) => {
+            return a.orderStatusId.localeCompare(b.orderStatusId);
+          });
+
 
           setOrderStatus(items);
         }
