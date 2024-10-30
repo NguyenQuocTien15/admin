@@ -1,8 +1,6 @@
-
 import { fs } from "@/firebase/firabaseConfig";
 import { Input, message, Modal } from "antd";
-import {  addDoc, collection, doc } from "firebase/firestore";
-import { setDoc } from "firebase/firestore/lite";
+import { collection, doc, setDoc } from "firebase/firestore";
 import React, { useState } from "react";
 
 type Props = {
@@ -15,43 +13,47 @@ const AddNewOrderStatus = (props: Props) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [orderStatusId, setOrderStatusId] = useState("");
-  const [title, setTitle] = useState("");
+  const [orderStatusName, setOrderStatusName] = useState("");
 
   const handleClose = () => {
-    setOrderStatusId('');
-    setTitle("");
+    setOrderStatusId("");
+    setOrderStatusName("");
     onClose();
   };
 
   const handleAddNewOrderStatus = async () => {
     if (!orderStatusId) {
       message.error("Missing orderStatusId");
-    } else if (!title) {
-      message.error("Missing  title");
-    } else {
-      setIsLoading(true);
+      return; // Thêm return để không tiếp tục nếu thiếu ID
+    }
+    if (!orderStatusName) {
+      message.error("Missing title");
+      return; // Thêm return để không tiếp tục nếu thiếu tên
+    }
 
-      try {
-         await addDoc(collection(fs, "orderStatus"), {
-            orderStatusId,
-           title,
-           createdAt: Date.now(),
-           updatedAt: Date.now(),
-         });
+    setIsLoading(true);
 
-        handleClose();
-        setIsLoading(false);
-      } catch (error: any) {
-        message.error(error.message);
-        setIsLoading(false);
-      }
+    try {
+      // Sử dụng setDoc để tạo tài liệu mới với ID được chỉ định
+      await setDoc(doc(fs, "orderStatus", orderStatusId), {
+        orderStatusName,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      });
+
+      handleClose();
+    } catch (error: any) {
+      message.error(error.message);
+    } finally {
+      setIsLoading(false);
     }
   };
+
   return (
     <Modal
       open={visible}
-      onOk={handleAddNewOrderStatus} // Trigger adding the brand
-      onCancel={handleClose} // Handle modal closing
+      onOk={handleAddNewOrderStatus}
+      onCancel={handleClose}
       title="Add new order status"
       okButtonProps={{ loading: isLoading }}
     >
@@ -73,8 +75,8 @@ const AddNewOrderStatus = (props: Props) => {
           maxLength={150}
           showCount
           allowClear
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={orderStatusName}
+          onChange={(e) => setOrderStatusName(e.target.value)}
         />
       </div>
     </Modal>

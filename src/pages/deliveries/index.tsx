@@ -1,66 +1,94 @@
 import { HeadComponent } from "@/components";
 import { fs } from "@/firebase/firabaseConfig";
-import { CheckOutlined, CheckSquareOutlined, DeleteOutlined } from "@ant-design/icons";
+
 import { Button, Space, Table, Tooltip } from "antd";
 import firebase from "firebase/compat/app";
-import { collection, getDocs, getFirestore } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  query,
+  where,
+} from "firebase/firestore";
 
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { FaEdit } from "react-icons/fa";
+import { BiTrash } from "react-icons/bi";
+import { FaCheck } from "react-icons/fa6";
 
-const NewOrders = ({  }) => {
+const NewOrders = ({}) => {
   const router = useRouter();
-  const [order, setOrders] = useState();
+  const [orders, setOrders] = useState();
   const [loading, setLoading] = useState(true); // To manage loading state
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const orderRef = collection(fs, "orders"); // Use the collection function
-        const snapshot = await getDocs(orderRef); // Use getDocs to retrieve documents
-        const ordersData = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setOrders(ordersData);
-      } catch (error) {
-        console.error("Error fetching orders: ", error);
-      } finally {
-        setLoading(false);
-      }
-    };
 
+ const fetchOrders = async () => {
+   setLoading(true);
+   try {
+     const orderRef = collection(fs, "orders");
+     const q = query(orderRef, where("orderStatusId", "==", "1"));
+     const snapshot = await getDocs(q);
+
+     const ordersData = snapshot.docs.map(async (doc) => {
+       const order = doc.data();
+       const orderStatusName = await getOrderStatusName(order.orderStatusId);
+       const paymentMethodName = await getPaymentMethodName(
+         order.paymentMethodId
+       );
+       return { id: doc.id, ...order, orderStatusName, paymentMethodName };
+       
+     });
+
+     setOrders(await Promise.all(ordersData));
+   } catch (error) {
+     console.error("Error fetching orders:", error);
+   } finally {
+     setLoading(false);
+   }
+ };
+
+ const getOrderStatusName = async (orderStatusId) => {
+  if (!orderStatusId) return "Unknown";
+  
+  try {
+    const orderStatusDoc = await getDoc(doc(fs, "orderStatus", orderStatusId));
+    return orderStatusDoc.exists() ? orderStatusDoc.data().orderStatusName : "Unknown";
+  } catch (error) {
+    console.error("Error fetching order status:", error);
+    return "Unknown";
+  }
+}
+  const getPaymentMethodName = async (id) => {
+  if (!id) return "Unknown";
+  
+  try {
+    const paymentMethodDoc = await getDoc(doc(fs, "paymentMethod", id));
+    return paymentMethodDoc.exists()
+      ? paymentMethodDoc.data().paymentMethodName
+      : "Unknown";
+  } catch (error) {
+    console.error("Error fetching order status:", error);
+    return "Unknown";
+  }
+};
+
+
+  useEffect(() => {
     fetchOrders();
   }, []);
 
   const columns = [
-    // {
-    //   title: "ID",
-    //   key: "id",
-    //   dataIndex: "id",
-    // },
-    {
-      title: "Name",
-      key: "userName",
-      dataIndex: "userName",
-    },
-    {
-      title: "Phone",
-      key: "phoneNumber",
-      dataIndex: "phoneNumber",
-    },
+    { title: "Name", key: "userName", dataIndex: "userName" },
+    { title: "Phone", key: "phoneNumber", dataIndex: "phoneNumber" },
     {
       title: "Product",
       key: "items",
       dataIndex: "items",
-      render: (items: any[]) => items.map((item) => item.id).join(", "), // Join product titles
+      render: (items: any[]) => items.map((item) => item.id).join(", "),
     },
-    {
-      title: "Address",
-      key: "address",
-      dataIndex: "address",
-    },
+    { title: "Address", key: "address", dataIndex: "address" },
     {
       title: "Shipper",
       key: "shipperId",
@@ -69,13 +97,16 @@ const NewOrders = ({  }) => {
     },
     {
       title: "Payment Method",
-      key: "paymentMethodId",
-      dataIndex: "paymentMethodId",
+      key: "paymentMethodName",
+      dataIndex: "paymentMethodName",
     },
     {
       title: "Status",
-      key: "orderStatusId",
-      dataIndex: "orderStatusId",
+      key: "orderStatusName",
+      dataIndex: "orderStatusName",
+      render: (text: string ) => (
+        <div style={{ backgroundColor: "#e6f7ff", padding: "8px" }}>{text}</div> 
+      ),
     },
     {
       title: "Date",
@@ -85,19 +116,20 @@ const NewOrders = ({  }) => {
     {
       title: "Action",
       dataIndex: "",
+
       render: () => (
         <Space>
           <Tooltip title="Cancel">
             <Button
               type="text"
-              icon={<DeleteOutlined size={35} style={{ color: "red" }} />}
+              icon={<BiTrash size={25} style={{ color: "red" }} />}
               onClick={() => router.push(``)}
             ></Button>
           </Tooltip>
           <Tooltip title="Confirm">
             <Button
               type="text"
-              icon={<CheckOutlined size={25} style={{ color: "blue" }} />}
+              icon={<FaCheck size={25} style={{ color: "green" }} />}
               onClick={() => router.push(``)}
             ></Button>
           </Tooltip>
@@ -105,6 +137,7 @@ const NewOrders = ({  }) => {
       ),
     },
   ];
+
   return (
     <div>
       <HeadComponent
@@ -119,7 +152,7 @@ const NewOrders = ({  }) => {
           </Button>
         }
       />
-      <Table dataSource={order} columns={columns} />
+      <Table dataSource={orders} columns={columns} />
     </div>
   );
 };

@@ -28,25 +28,20 @@ const OrderStatus = () => {
               ...item.data(),
             });
           });
-          items.sort((a, b) => {
-            return a.orderStatusId.localeCompare(b.orderStatusId);
-          });
-
-
           setOrderStatus(items);
         }
       });
     }, []);
 const columns: ColumnProps<OrderStatusModel>[] = [
   {
-    title:'ID',
-    key: "orderStatusId",
-    dataIndex: "orderStatusId",
+    title: "ID",
+    key: "id",
+    dataIndex: "id",
   },
   {
-    title:'Status',
-    key: "title",
-    dataIndex: "title",
+    title: "Status",
+    key: "orderStatusName",
+    dataIndex: "orderStatusName",
   },
 ];
   return (
