@@ -1,0 +1,49 @@
+/* styles/NavBar.module.css */
+.nav {
+  background-color: #f9f9f9; /* Light background color */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  padding: 10px 10px; /* Padding for spacing */
+}
+
+.container {
+  display: flex; /* Flexbox layout */
+  justify-content: space-between; /* Space between items */
+  align-items: center; /* Center items vertically */
+}
+
+.link {
+  color: #333; /* Dark text color */
+  text-decoration: none; /* Remove underline */
+  padding: 10px 15px; /* Padding for clickable area */
+  border-radius: 5px; /* Rounded corners */
+  transition: background-color 0.3s ease; /* Transition for hover effect */
+}
+
+.link:hover {
+  background-color: #e0e0e0; /* Light grey on hover */
+}
+
+/* Active link styles */
+.active {
+  background-color: #d3d3d3; /* Background color for active link */
+  font-weight: bold; /* Make active link bold */
+}
+.menu {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  justify-content: center;
+}
+.item {
+  padding: 10px 15px;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+  cursor: pointer;
+}
+.activeItem {
+  padding: 10px 15px;
+  border-radius: 5px;
+  background-color: #0070f3;
+  color: #fff;
+  cursor: pointer;
+}

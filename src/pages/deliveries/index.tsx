@@ -1,14 +1,13 @@
 import { HeadComponent } from "@/components";
+import Layout from "@/components/Layout";
 import { fs } from "@/firebase/firabaseConfig";
 
 import { Button, Space, Table, Tooltip } from "antd";
-import firebase from "firebase/compat/app";
 import {
   collection,
   doc,
   getDoc,
   getDocs,
-  getFirestore,
   query,
   where,
 } from "firebase/firestore";
@@ -23,57 +22,58 @@ const NewOrders = ({}) => {
   const [orders, setOrders] = useState();
   const [loading, setLoading] = useState(true); // To manage loading state
 
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      const orderRef = collection(fs, "orders");
+      const q = query(orderRef, where("orderStatusId", "==", "1"));
+      const snapshot = await getDocs(q);
 
- const fetchOrders = async () => {
-   setLoading(true);
-   try {
-     const orderRef = collection(fs, "orders");
-     const q = query(orderRef, where("orderStatusId", "==", "1"));
-     const snapshot = await getDocs(q);
+      const ordersData = snapshot.docs.map(async (doc) => {
+        const order = doc.data();
+        const orderStatusName = await getOrderStatusName(order.orderStatusId);
+        const paymentMethodName = await getPaymentMethodName(
+          order.paymentMethodId
+        );
+        return { id: doc.id, ...order, orderStatusName, paymentMethodName };
+      });
 
-     const ordersData = snapshot.docs.map(async (doc) => {
-       const order = doc.data();
-       const orderStatusName = await getOrderStatusName(order.orderStatusId);
-       const paymentMethodName = await getPaymentMethodName(
-         order.paymentMethodId
-       );
-       return { id: doc.id, ...order, orderStatusName, paymentMethodName };
-       
-     });
+      setOrders(await Promise.all(ordersData));
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-     setOrders(await Promise.all(ordersData));
-   } catch (error) {
-     console.error("Error fetching orders:", error);
-   } finally {
-     setLoading(false);
-   }
- };
+  const getOrderStatusName = async (orderStatusId: string) => {
+    if (!orderStatusId) return "Unknown";
 
- const getOrderStatusName = async (orderStatusId) => {
-  if (!orderStatusId) return "Unknown";
-  
-  try {
-    const orderStatusDoc = await getDoc(doc(fs, "orderStatus", orderStatusId));
-    return orderStatusDoc.exists() ? orderStatusDoc.data().orderStatusName : "Unknown";
-  } catch (error) {
-    console.error("Error fetching order status:", error);
-    return "Unknown";
-  }
-}
-  const getPaymentMethodName = async (id) => {
-  if (!id) return "Unknown";
-  
-  try {
-    const paymentMethodDoc = await getDoc(doc(fs, "paymentMethod", id));
-    return paymentMethodDoc.exists()
-      ? paymentMethodDoc.data().paymentMethodName
-      : "Unknown";
-  } catch (error) {
-    console.error("Error fetching order status:", error);
-    return "Unknown";
-  }
-};
+    try {
+      const orderStatusDoc = await getDoc(
+        doc(fs, "orderStatus", orderStatusId)
+      );
+      return orderStatusDoc.exists()
+        ? orderStatusDoc.data().orderStatusName
+        : "Unknown";
+    } catch (error) {
+      console.error("Error fetching order status:", error);
+      return "Unknown";
+    }
+  };
+  const getPaymentMethodName = async (id: string) => {
+    if (!id) return "Unknown";
 
+    try {
+      const paymentMethodDoc = await getDoc(doc(fs, "paymentMethod", id));
+      return paymentMethodDoc.exists()
+        ? paymentMethodDoc.data().paymentMethodName
+        : "Unknown";
+    } catch (error) {
+      console.error("Error fetching order status:", error);
+      return "Unknown";
+    }
+  };
 
   useEffect(() => {
     fetchOrders();
@@ -104,8 +104,8 @@ const NewOrders = ({}) => {
       title: "Status",
       key: "orderStatusName",
       dataIndex: "orderStatusName",
-      render: (text: string ) => (
-        <div style={{ backgroundColor: "#e6f7ff", padding: "8px" }}>{text}</div> 
+      render: (text: string) => (
+        <div style={{ backgroundColor: "#e6f7ff", padding: "8px" }}>{text}</div>
       ),
     },
     {
@@ -139,21 +139,13 @@ const NewOrders = ({}) => {
   ];
 
   return (
-    <div>
-      <HeadComponent
-        title="Delivery"
-        pageTitle="New Order"
-        extra={
-          <Button
-            type="primary"
-            onClick={() => router.push(`/deliveries/order-management`)}
-          >
-            Order Management
-          </Button>
-        }
-      />
+    <Layout>
+      <div className="mt-3"><HeadComponent
+        title="Order Management"
+        pageTitle="New Order"></HeadComponent></div>
+      
       <Table dataSource={orders} columns={columns} />
-    </div>
+    </Layout>
   );
 };
 
