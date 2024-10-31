@@ -9,6 +9,7 @@ import {
   getDoc,
   getDocs,
   query,
+  updateDoc,
   where,
 } from "firebase/firestore";
 
@@ -35,7 +36,16 @@ const NewOrders = ({}) => {
         const paymentMethodName = await getPaymentMethodName(
           order.paymentMethodId
         );
-        return { id: doc.id, ...order, orderStatusName, paymentMethodName };
+        const { displayName, phoneNumber } = await getUserOrder(order.userId);
+
+        return {
+          id: doc.id,
+          ...order,
+          orderStatusName,
+          paymentMethodName,
+          displayName,
+          phoneNumber,
+        };
       });
 
       setOrders(await Promise.all(ordersData));
@@ -74,13 +84,48 @@ const NewOrders = ({}) => {
       return "Unknown";
     }
   };
+  const getUserOrder = async (id: string) => {
+    if (!id) return { displayName: "Unknown", phoneNumber: "Unknown" };
+
+    try {
+      const userDoc = await getDoc(doc(fs, "users", id));
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        return {
+          displayName: userData.displayName || "Unknown",
+          phoneNumber: userData.phoneNumber || "Unknown",
+        };
+      } else {
+        return { displayName: "Unknown", phoneNumber: "Unknown" };
+      }
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      return { displayName: "Unknown", phoneNumber: "Unknown" };
+    }
+  };
+
 
   useEffect(() => {
     fetchOrders();
   }, []);
+ const handleConfirmNewOrder = async (orderId: string) => {
+   try {
+     const orderRef = doc(fs, "orders", orderId); 
+     await updateDoc(orderRef, {
+       orderStatusId: "2", 
+     });
+     alert("Confirm order successfully");
+
+     
+     fetchOrders(); 
+   } catch (error) {
+     console.error("Error updating order status:", error);
+   }
+ };
 
   const columns = [
-    { title: "Name", key: "userName", dataIndex: "userName" },
+    { title: "Name", key: "displayName", dataIndex: "displayName" },
     { title: "Phone", key: "phoneNumber", dataIndex: "phoneNumber" },
     {
       title: "Product",
@@ -115,22 +160,22 @@ const NewOrders = ({}) => {
     },
     {
       title: "Action",
-      dataIndex: "",
-
-      render: () => (
+      dataIndex: "id",
+      
+      render: (id: string) => (
         <Space>
           <Tooltip title="Cancel">
             <Button
               type="text"
               icon={<BiTrash size={25} style={{ color: "red" }} />}
-              onClick={() => router.push(``)}
+              onClick={() => router.push(`/cancel/${id}`)} 
             ></Button>
           </Tooltip>
           <Tooltip title="Confirm">
             <Button
-              type="text"
+              key={id}
               icon={<FaCheck size={25} style={{ color: "green" }} />}
-              onClick={() => router.push(``)}
+              onClick={() => handleConfirmNewOrder(id)} 
             ></Button>
           </Tooltip>
         </Space>
