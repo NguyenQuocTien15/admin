@@ -89,8 +89,8 @@ const Products = () => {
 
     {
       key: "brand",
-      title: "Brands",
-      dataIndex: "brands",
+      title: "Brand",
+      dataIndex: "brand",
     //   render: (ids: string[]) =>
     //     ids &&
     //     ids.length > 0 && (

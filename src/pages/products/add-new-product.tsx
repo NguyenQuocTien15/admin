@@ -22,7 +22,7 @@ const AddNewProduct = () => {
 	const [files, setFiles] = useState<any[]>([]);
 	const [imgUrl, setImgUrl] = useState('');
 	const [categories, setCategories] = useState<any[]>([]);
-	const [brands, setBrands] = useState<any[]>([]);
+	const [brand, setBrand] = useState<any[]>([]);
 	const [isVisibleModalAddCategory, setIsVisibleModalAddCategory] =
 		useState(false);
 
@@ -118,7 +118,7 @@ const getBrands = () => {
   onSnapshot(collection(fs, "brands"), (snap) => {
     if (snap.empty) {
       console.log("Data not found!");
-      setBrands([]);
+      setBrand([]);
     } else {
       const items: any[] = [];
 
@@ -129,7 +129,7 @@ const getBrands = () => {
         });
       });
 
-      setBrands(items);
+      setBrand(items);
     }
   });
 };
@@ -175,8 +175,8 @@ const getBrands = () => {
             <Form.Item name={"categories"} label="Categories">
               <Select mode="multiple" options={categories} />
             </Form.Item>
-            <Form.Item name={"brands"} label="Brands">
-              <Select options={brands} />
+            <Form.Item name={"brand"} label="Brand">
+              <Select options={brand} />
             </Form.Item>
             <Form.Item name={"description"} label="Description">
               <Input.TextArea rows={3} />
