@@ -5,6 +5,7 @@ import { fs } from "@/firebase/firabaseConfig";
 import { Button, Space, Table, Tooltip } from "antd";
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -122,7 +123,16 @@ const NewOrders = ({}) => {
    } catch (error) {
      console.error("Error updating order status:", error);
    }
- };
+ }; 
+ const handleDeleteOrder = async( orderId: string)=>{
+  try {
+    const orderRef = doc(fs, 'orders', orderId)
+    await deleteDoc(orderRef)
+    fetchOrders();
+  } catch (error) {
+    console.error("Error delete order status:", error);
+  }
+ }
 
   const columns = [
     { title: "Name", key: "displayName", dataIndex: "displayName" },
@@ -131,7 +141,7 @@ const NewOrders = ({}) => {
       title: "Product",
       key: "items",
       dataIndex: "items",
-      render: (items: any[]) => items.map((item) => item.id).join(", "),
+      render: (items: any[]) => items.map((item) => item.productId).join(", "),
     },
     { title: "Address", key: "address", dataIndex: "address" },
     {
@@ -166,9 +176,9 @@ const NewOrders = ({}) => {
         <Space>
           <Tooltip title="Cancel">
             <Button
-              type="text"
+              key={id}
               icon={<BiTrash size={25} style={{ color: "red" }} />}
-              onClick={() => router.push(`/cancel/${id}`)} 
+              onClick={() => handleDeleteOrder(id)} 
             ></Button>
           </Tooltip>
           <Tooltip title="Confirm">

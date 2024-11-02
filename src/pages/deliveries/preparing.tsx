@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout"; // Adjust path as needed
 import { HeadComponent } from "@/components";
 import { Button, Table, Tooltip } from "antd";
-import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { useRouter } from "next/router";
 import { fs } from "@/firebase/firabaseConfig";
 
@@ -95,7 +95,19 @@ const getUserOrder = async (id: string) => {
   useEffect(() => {
     fetchOrders();
   }, []);
-  const handleConfirmNewOrder = () => {};
+  const handlePackageOrder = async (orderId: string) => {
+    try {
+      const orderRef = doc(fs, "orders", orderId);
+      await updateDoc(orderRef, {
+        orderStatusId: "3",
+      });
+      alert("Package order successfully");
+
+      fetchOrders();
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
 
   const columns = [
     { title: "Name", key: "displayName", dataIndex: "displayName" },
@@ -133,11 +145,11 @@ const getUserOrder = async (id: string) => {
     },
     {
       title: "Action",
-      dataIndex: "",
+      dataIndex: "id",
 
-      render: () => (
+      render: (id: string) => (
         <Tooltip title="Preparing">
-          <Button className="btn-primary" onClick={() => router.push(``)}>
+          <Button className="btn-primary" key={id} onClick={() => handlePackageOrder(id)}>
             Đóng gói
           </Button>
         </Tooltip>
