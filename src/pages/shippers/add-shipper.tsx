@@ -8,7 +8,6 @@ import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { auth, fs, storage } from "@/firebase/firabaseConfig";
 import { UploadOutlined } from "@ant-design/icons";
 
-
 const AddShippers = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -18,9 +17,32 @@ const AddShippers = () => {
   const [password, setPassword] = useState("");
   const [CIN, setCIN] = useState("");
   const [dateOfIssuance, setDateOfIssuance] = useState("");
-  const [filesAvatar, setFilesAvatar] = useState<File[]>([]);
-  const [filesFront, setFilesFront] = useState<File[]>([]);
-  const [filesBack, setFilesBack] = useState<File[]>([]);
+  const[filesAvatar, setFilesAvatar] = useState([]);
+  const [previewUrlAvatar, setPreviewUrlAvatar] = useState(null);
+
+  const [filesFront, setFilesFront] = useState([]);
+  const [previewUrlFront, setPreviewUrlFront] = useState(null);
+
+  const [filesBack, setFilesBack] = useState([]);
+  const [previewUrlBack, setPreviewUrlBack] = useState(null);
+
+  const handleBeforeUploadAvatar = (file: Blob | MediaSource) => {
+    setFilesAvatar([file]);
+    setPreviewUrlAvatar(URL.createObjectURL(file));
+    return false;
+  };
+
+  const handleBeforeUploadFront = (file: Blob | MediaSource) => {
+    setFilesFront([file]);
+    setPreviewUrlFront(URL.createObjectURL(file));
+    return false;
+  };
+
+  const handleBeforeUploadBack = (file: Blob | MediaSource) => {
+    setFilesBack([file]);
+    setPreviewUrlBack(URL.createObjectURL(file));
+    return false;
+  };
   const handleSaveShipper = async () => {
     setIsLoading(true);
     try {
@@ -43,17 +65,32 @@ const AddShippers = () => {
       const backRef = ref(storage, `cccd/back/${shipper.uid}`);
       await uploadBytes(backRef, filesBack[0]);
       const backUrl = await getDownloadURL(backRef); // Fixed
-
+      if (CIN.length !== 12) {
+        alert("Vui lòng nhập đủ 12 số căn cước công dân");
+        return;
+      }
+      if (phoneNumber.length !== 10) {
+        alert("Vui lòng nhập đủ 12 số căn cước công dân");
+        return;
+      }
+      if (!avatarUrl || !frontUrl || !backUrl) {
+        alert(
+          "Please select all required images (Avatar, CCCD Card Front, CCCD Card Back)."
+        );
+        return; // Stop execution if any image is missing
+      }
       // Lưu thông tin người dùng vào Firestore
       await setDoc(doc(fs, "shippers", shipper.uid), {
+        shipperId: shipper.uid,
         fullName,
         email,
         phoneNumber,
         CIN,
-        DateOfIssuance: new Date(dateOfIssuance),
+        dateOfIssuance,
         avatar: avatarUrl,
         image_CCCD_card_front: frontUrl,
         image_CCCD_card_back: backUrl,
+        filesAvatar: filesFront.map((file) => file.name),
         files_card_front: filesFront.map((file) => file.name),
         files_card_back: filesBack.map((file) => file.name),
       });
@@ -69,9 +106,15 @@ const AddShippers = () => {
   };
   return (
     <div className="form-fluid">
-      <h2>Register New User</h2>
-
-      {/* Full name input */}
+      <HeadComponent
+        title="Shipper"
+        pageTitle="Register New User"
+        extra={
+          <Button type="primary" onClick={() => router.back()}>
+            Back
+          </Button>
+        }
+      />
       <div className="input-group">
         <label>Full Name</label>
         <Input
@@ -80,7 +123,6 @@ const AddShippers = () => {
           onChange={(e) => setFullName(e.target.value)}
         />
       </div>
-
       {/* Email input */}
       <div className="input-group">
         <label>Email</label>
@@ -91,17 +133,16 @@ const AddShippers = () => {
           onChange={(e) => setEmail(e.target.value)}
         />
       </div>
-
       {/* Phone number input */}
       <div className="input-group">
         <label>Phone Number</label>
         <Input
+          maxLength={10}
           placeholder="Enter phone number"
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
         />
       </div>
-
       {/* Password input */}
       <div className="input-group">
         <label>Password</label>
@@ -112,19 +153,18 @@ const AddShippers = () => {
           onChange={(e) => setPassword(e.target.value)}
         />
       </div>
-
       {/* CIN input */}
       <div className="input-group">
         <label>Citizen Identification Number (CIN)</label>
         <Input
           placeholder="Enter CIN"
+          maxLength={12}
           value={CIN}
           onChange={(e) => setCIN(e.target.value)}
         />
       </div>
-
       {/* Date of Issuance input */}
-      <div className="input-group">
+      <div className="input-group mb-3">
         <label>Date of Issuance</label>
         <Input
           type="date"
@@ -133,49 +173,80 @@ const AddShippers = () => {
           onChange={(e) => setDateOfIssuance(e.target.value)}
         />
       </div>
+      <div className="row">
+        {/* Avatar Upload */}
 
-      {/* Upload Avatar */}
-      <div className="input-group">
-        <label>Upload Avatar</label>
-        <Upload
-          beforeUpload={(file) => {
-            setFilesAvatar([file]);
-            return false; // Prevent automatic upload
-          }}
-        >
-          <Button icon={<UploadOutlined />}>Select Avatar</Button>
-        </Upload>
-        {filesAvatar.length > 0 && (
-          <p>Selected Avatar: {filesAvatar[0].name}</p>
-        )}
-      </div>
+        <div className="col-4">
+          <label>Upload Avatar</label>
 
-      {/* Upload Front of CIN */}
-      <div className="input-group">
-        <label>Upload Front of CIN</label>
-        <Upload
-          beforeUpload={(file) => {
-            setFilesFront([file]);
-            return false;
-          }}
-        >
-          <Button icon={<UploadOutlined />}>Select Front of CIN</Button>
-        </Upload>
-        {filesFront.length > 0 && <p>Selected File: {filesFront[0].name}</p>}
-      </div>
+          <div className="input-group">
+            <Upload beforeUpload={handleBeforeUploadAvatar}>
+              <Button icon={<UploadOutlined />}>Select Avatar</Button>
+            </Upload>
+            {filesAvatar.length > 0 && (
+              <>
+                {/* <p>Selected File: {filesAvatar[0].name}</p> */}
+                {previewUrlAvatar && (
+                  <img
+                    src={previewUrlAvatar}
+                    alt="Avatar Preview"
+                    style={{ width: "100px", marginTop: "10px" }}
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </div>
 
-      {/* Upload Back of CIN */}
-      <div className="input-group">
-        <label>Upload Back of CIN</label>
-        <Upload
-          beforeUpload={(file) => {
-            setFilesBack([file]);
-            return false;
-          }}
-        >
-          <Button icon={<UploadOutlined />}>Select Back of CIN</Button>
-        </Upload>
-        {filesBack.length > 0 && <p>Selected File: {filesBack[0].name}</p>}
+        {/* Front of CIN Upload */}
+        <div className="col-4">
+          <label>Upload Front of CIN</label>
+          <div className="input-group">
+            <Upload beforeUpload={handleBeforeUploadFront}>
+              <Button icon={<UploadOutlined />}>Select Front of CIN</Button>
+            </Upload>
+            {filesFront.length > 0 && (
+              <>
+                {/* <p>Selected File: {filesFront[0].name}</p> */}
+
+                {previewUrlFront && (
+                  <>
+                    <br />
+                    <img
+                      src={previewUrlFront}
+                      alt="Front of CIN Preview"
+                      style={{ width: "100px", marginTop: "10px" }}
+                    />
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Back of CIN Upload */}
+        <div className="col-4">
+          <label>Upload Back of CIN</label>
+          <div className="input-group">
+            <div>
+              <Upload beforeUpload={handleBeforeUploadBack}>
+                <Button icon={<UploadOutlined />}>Select Back of CIN</Button>
+              </Upload>
+            </div>
+            {filesBack.length > 0 && (
+              <>
+                {/* <p>Selected File: {filesBack[0].name}</p> */}
+                {previewUrlBack && (
+                  <img
+                    src={previewUrlBack}
+                    alt="Back of CIN Preview"
+                    style={{ width: "100px", marginTop: "10px" }}
+                  />
+                )}
+              </>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Submit Button */}
@@ -190,6 +261,5 @@ const AddShippers = () => {
     </div>
   );
 };
-
 
 export default AddShippers;
