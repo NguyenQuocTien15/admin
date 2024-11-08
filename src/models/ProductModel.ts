@@ -5,6 +5,7 @@ export interface ProductModel {
   price: string;
   title: string;
   imageUrl: string;
+  promotion:string;
   files: string[];
   categories: string[];
   brand: string;

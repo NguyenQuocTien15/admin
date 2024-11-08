@@ -16,6 +16,7 @@ import {
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { BiAddToQueue } from 'react-icons/bi';
+import Offers from '../offers';
 
 const AddNewProduct = () => {
 	const [isLoading, setIsLoading] = useState(false);
@@ -23,6 +24,7 @@ const AddNewProduct = () => {
 	const [imgUrl, setImgUrl] = useState('');
 	const [categories, setCategories] = useState<any[]>([]);
 	const [brand, setBrand] = useState<any[]>([]);
+	const [offer, setOffer] = useState<any[]>([]);
 	const [isVisibleModalAddCategory, setIsVisibleModalAddCategory] =
 		useState(false);
 
@@ -39,6 +41,9 @@ const AddNewProduct = () => {
 	}, []);
 	useEffect(() => {
     getBrands();
+  }, []);
+	useEffect(() => {
+    getOffers();
   }, []);
 
 	const getProductDetail = async (id: string) => {
@@ -133,6 +138,25 @@ const getBrands = () => {
     }
   });
 };
+const getOffers = () => {
+  onSnapshot(collection(fs, "offers"), (snap) => {
+    if (snap.empty) {
+      console.log("Data not found!");
+      setBrand([]);
+    } else {
+      const items: any[] = [];
+
+      snap.forEach((item: any) => {
+        items.push({
+          value: item.id,
+          label: item.data().title,
+        });
+      });
+
+      setOffer(items);
+    }
+  });
+};
 	return (
     <div>
       <HeadComponent
@@ -178,12 +202,16 @@ const getBrands = () => {
             <Form.Item name={"brand"} label="Brand">
               <Select options={brand} />
             </Form.Item>
+            <Form.Item name={"offer"} label="Offer">
+              <Select options={offer} />
+            </Form.Item>
             <Form.Item name={"description"} label="Description">
               <Input.TextArea rows={3} />
             </Form.Item>
             <Form.Item name={"price"} label="Price">
               <Input type="number" />
             </Form.Item>
+            
           </Form>
 
           {files.length > 0 && (
