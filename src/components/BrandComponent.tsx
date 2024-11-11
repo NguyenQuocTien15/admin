@@ -40,7 +40,7 @@
 // export default BrandComponent;
 /** @format */
 
-import { fs } from '@/firebase/firabaseConfig';
+import { fs } from '@/firebase/firebaseConfig';
 import { BrandModel } from '@/models/BrandModel';
 import { OfferModel } from '@/models/OfferModel';
 import { Avatar, Spin } from 'antd';
