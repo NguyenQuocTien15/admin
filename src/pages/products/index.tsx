@@ -4,6 +4,7 @@ import { HeadComponent } from "@/components";
 import AvatarComponent from "@/components/AvatarComponent";
 import BrandComponent from "@/components/BrandComponent";
 import CategoryComponent from "@/components/CategoryComponent";
+import OfferComponent from "@/components/OfferComponent";
 import { fs } from "@/firebase/firabaseConfig";
 import { ProductModel } from "@/models/ProductModel";
 import { Button, Space, Table, Tag, Tooltip } from "antd";
@@ -91,23 +92,30 @@ const Products = () => {
       key: "brand",
       title: "Brand",
       dataIndex: "brand",
-    //   render: (ids: string[]) =>
-    //     ids &&
-    //     ids.length > 0 && (
-    //       <Space>
-    //         {ids.map((id) => (
-    //           <Tag>
-    //             <BrandComponent id={id} key={id} />
-    //           </Tag>
-    //         ))}
-    //       </Space>
-    //     ),
+      render: (brandId) =>
+        brandId ? (
+          <BrandComponent id={brandId} />
+        ) : (
+          ""
+        ),
     },
 
     {
       key: "Price",
       title: "Price",
       dataIndex: "price",
+    },
+   
+    {
+      key: "offer",
+      title: "Offer",
+      dataIndex: "offer",
+      render: (offerId) =>
+        offerId ? (
+          <OfferComponent id={offerId} />
+        ) : (
+          "N/A"
+        ),
     },
     {
       title: "",

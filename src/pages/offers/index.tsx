@@ -54,7 +54,7 @@ const Offers = () => {
 			),
 		},
 		{
-			key: 'Title',
+			key: 'title',
 			dataIndex: 'title',
 			title: 'Title',
 		},
