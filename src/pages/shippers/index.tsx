@@ -1,5 +1,5 @@
 import { HeadComponent } from "@/components";
-import { Button } from "antd";
+import { Button, Space, Tooltip } from "antd";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { ShipperModel } from "@/models/ShipperModel";
@@ -7,6 +7,8 @@ import AddNewShipper from "@/modals/AddNewShipper";
 import Table, { ColumnProps } from "antd/es/table";
 import { collection, onSnapshot } from "firebase/firestore";
 import { fs } from "@/firebase/firabaseConfig";
+import { BiTrash } from "react-icons/bi";
+import { EditFilled } from "@ant-design/icons";
 const Shippers = () => {
   const router = useRouter();
   const [shippers, setShippers] = useState<ShipperModel[]>([]);
@@ -94,6 +96,24 @@ const Shippers = () => {
       dataIndex: "image_CCCD_card_back",
       render: (backUrl: string) => (
         <img src={backUrl} alt="CCCD Back" style={{ width: 80, height: 40 }} />
+      ),
+    },
+    {
+      title: "Action",
+
+      render: () => (
+        <Space>
+          <Tooltip title="Update">
+            <Button
+              icon={<EditFilled size={25} style={{ color: "green" }} />}
+            ></Button>
+          </Tooltip>
+          <Tooltip title="Delete">
+            <Button
+              icon={<BiTrash size={25} style={{ color: "red" }} />}
+            ></Button>
+          </Tooltip>
+        </Space>
       ),
     },
   ];
