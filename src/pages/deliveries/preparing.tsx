@@ -116,7 +116,7 @@ const getUserOrder = async (id: string) => {
       title: "Product",
       key: "items",
       dataIndex: "items",
-      render: (items: any[]) => items.map((item) => item.id).join(", "),
+      render: (items: any[]) => items.map((item) => item.title).join(",\n "),
     },
     { title: "Address", key: "address", dataIndex: "address" },
     {
@@ -149,7 +149,11 @@ const getUserOrder = async (id: string) => {
 
       render: (id: string) => (
         <Tooltip title="Preparing">
-          <Button className="btn-primary" key={id} onClick={() => handlePackageOrder(id)}>
+          <Button
+            className="btn-primary"
+            key={id}
+            onClick={() => handlePackageOrder(id)}
+          >
             Đóng gói
           </Button>
         </Tooltip>
