@@ -1,7 +1,7 @@
 import React, { Dispatch, SetStateAction, useEffect, useRef } from 'react';
 import { Timestamp as FirebaseTimestamp } from 'firebase/firestore';
 import { format } from 'date-fns';
-import styles from "../styles/chats.module.css"
+import styles from "../styles/chat.module.css"
 interface Message {
   userId: string;
   adminId: string;
