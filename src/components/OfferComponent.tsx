@@ -1,6 +1,6 @@
 /** @format */
 
-import { fs } from '@/firebase/firabaseConfig';
+import { fs } from '@/firebase/firebaseConfig';
 import { OfferModel } from '@/models/OfferModel';
 import { Avatar, Spin } from 'antd';
 import { doc, getDoc } from 'firebase/firestore';

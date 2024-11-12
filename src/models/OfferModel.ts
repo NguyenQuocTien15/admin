@@ -4,7 +4,7 @@ export interface OfferModel {
   endAt: number;
   files: string[];
   id: string;
-  percent: string;
+  percent: number;
   startAt: number;
   title: string;
   imageUrl: string;

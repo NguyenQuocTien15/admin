@@ -1,4 +1,4 @@
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 import { Input, message, Modal } from "antd";
 import { collection, doc, setDoc } from "firebase/firestore";
 import React, { useState } from "react";

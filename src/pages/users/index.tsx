@@ -1,7 +1,7 @@
 /** @format */
 
 import { collectionNames } from '@/constants/collectionNames';
-import { fs } from '@/firebase/firabaseConfig';
+import { fs } from '@/firebase/firebaseConfig';
 import { UserModel } from '@/models/UserModel';
 import { ColumnProps } from 'antd/es/table';
 import { collection, onSnapshot } from 'firebase/firestore';

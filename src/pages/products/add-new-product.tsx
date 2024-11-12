@@ -1,7 +1,7 @@
 /** @format */
 
 import { HeadComponent, ImagePicker } from '@/components';
-import { fs } from '@/firebase/firabaseConfig';
+import { fs } from '@/firebase/firebaseConfig';
 import { AddNewCategory } from '@/modals';
 import { HandleFile } from '@/utils/handleFile';
 import { Button, Card, Form, Image, Input, Select, message } from 'antd';

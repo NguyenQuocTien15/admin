@@ -4,7 +4,7 @@ import { HeadComponent } from "@/components";
 import { Button, Table, Tooltip } from "antd";
 import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import { useRouter } from "next/router";
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 
 const Preparing: React.FC = () => {
   const router = useRouter();

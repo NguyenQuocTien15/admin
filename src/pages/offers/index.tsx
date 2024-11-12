@@ -6,7 +6,7 @@ import { ColumnProps } from 'antd/es/table';
 import { HeadComponent } from '@/components';
 import AvatarComponent from '@/components/AvatarComponent';
 import { collectionNames } from '@/constants/collectionNames';
-import { fs } from '@/firebase/firabaseConfig';
+import { fs } from '@/firebase/firebaseConfig';
 import { OfferModel } from '@/models/OfferModel';
 import { DateTime } from '@/utils/dateTime';
 import { HandleFile } from '@/utils/handleFile';

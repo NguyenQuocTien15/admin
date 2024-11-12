@@ -39,8 +39,8 @@ const SiderComponent = () => {
       icon: <UserAddOutlined />,
     },
     {
-      key: "messengeruser",
-      label: <Link href={"/messengeruser"}>MessengerUsers</Link>,
+      key: "chats",
+      label: <Link href={"/chats"}>Chats</Link>,
       icon: <FaRegEnvelope />,
     },
     {

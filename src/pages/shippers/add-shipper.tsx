@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { auth, fs, storage } from "@/firebase/firabaseConfig";
+import { auth, fs, storage } from "@/firebase/firebaseConfig";
 import { UploadOutlined } from "@ant-design/icons";
 
 const AddShippers = () => {

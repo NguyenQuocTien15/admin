@@ -5,7 +5,7 @@ import AvatarComponent from "@/components/AvatarComponent";
 import BrandComponent from "@/components/BrandComponent";
 import CategoryComponent from "@/components/CategoryComponent";
 import OfferComponent from "@/components/OfferComponent";
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 import { ProductModel } from "@/models/ProductModel";
 import { Button, Space, Table, Tag, Tooltip } from "antd";
 import { ColumnProps } from "antd/es/table";

@@ -1,6 +1,6 @@
 /** @format */
 
-import { auth } from '@/firebase/firabaseConfig';
+import { auth } from '@/firebase/firebaseConfig';
 import { Layout } from 'antd';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/router';

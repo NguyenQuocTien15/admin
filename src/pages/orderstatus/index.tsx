@@ -2,7 +2,7 @@
 
 import { HeadComponent } from "@/components";
 import AvatarComponent from "@/components/AvatarComponent";
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 import AddNewOrderStatus from "@/modals/AddNewOrderStatus";
 import { OrderStatusModel } from "@/models/OrderStatusModel";
 import { Button, Table } from "antd";

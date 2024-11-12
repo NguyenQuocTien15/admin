@@ -1,6 +1,6 @@
 import { deleteObject, getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import { replaceName } from './replaceName';
-import { fs, storage } from '@/firebase/firabaseConfig';
+import { fs, storage } from '@/firebase/firebaseConfig';
 import { addDoc, arrayUnion, collection, deleteDoc, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { handleResize } from './resizeImage';
 import path from 'path';

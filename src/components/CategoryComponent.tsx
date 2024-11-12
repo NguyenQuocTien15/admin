@@ -1,6 +1,6 @@
 /** @format */
 
-import { fs } from '@/firebase/firabaseConfig';
+import { fs } from '@/firebase/firebaseConfig';
 import { CategoryModel } from '@/models/CategoryModel';
 import { Avatar } from 'antd';
 import { doc, getDoc } from 'firebase/firestore';

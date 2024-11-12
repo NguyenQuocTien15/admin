@@ -3,7 +3,7 @@ import Layout from "../../components/Layout"; // Adjust path as needed
 import { HeadComponent } from "@/components";
 import { Button, Table, Tooltip } from "antd";
 import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 
 const Package: React.FC = () => {
   const [orders, setOrders] = useState();

@@ -6,7 +6,7 @@ import { ShipperModel } from "@/models/ShipperModel";
 import AddNewShipper from "@/modals/AddNewShipper";
 import Table, { ColumnProps } from "antd/es/table";
 import { collection, onSnapshot } from "firebase/firestore";
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 const Shippers = () => {
   const router = useRouter();
   const [shippers, setShippers] = useState<ShipperModel[]>([]);

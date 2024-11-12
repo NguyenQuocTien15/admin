@@ -1,7 +1,7 @@
 /** @format */
 
 import { ImagePicker } from '@/components';
-import { fs } from '@/firebase/firabaseConfig';
+import { fs } from '@/firebase/firebaseConfig';
 import { generatorRandomText } from '@/utils/generatorRadomText';
 import { HandleFile } from '@/utils/handleFile';
 import { Button, Card, DatePicker, Form, Input } from 'antd';

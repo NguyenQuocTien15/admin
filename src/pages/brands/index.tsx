@@ -3,7 +3,7 @@
 import { HeadComponent } from "@/components";
 import AvatarComponent from "@/components/AvatarComponent";
 
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 import { AddNewBrand } from "@/modals";
 import { BrandModel } from "@/models/BrandModel";
 import { Button, Space, Table, Tooltip } from "antd";
