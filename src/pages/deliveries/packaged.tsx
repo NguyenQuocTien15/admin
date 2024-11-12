@@ -93,19 +93,6 @@ const Package: React.FC = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
-  const handlePackageOrder = async (orderId: string) => {
-    try {
-      const orderRef = doc(fs, "orders", orderId);
-      await updateDoc(orderRef, {
-        orderStatusId: "3",
-      });
-      alert("Package order successfully");
-
-      fetchOrders();
-    } catch (error) {
-      console.error("Error updating order status:", error);
-    }
-  };
 
   const columns = [
     { title: "Name", key: "displayName", dataIndex: "displayName" },
@@ -114,7 +101,7 @@ const Package: React.FC = () => {
       title: "Product",
       key: "items",
       dataIndex: "items",
-      render: (items: any[]) => items.map((item) => item.id).join(", "),
+      render: (items: any[]) => items.map((item) => item.title).join(",\n "),
     },
     { title: "Address", key: "address", dataIndex: "address" },
     {
@@ -141,7 +128,6 @@ const Package: React.FC = () => {
       key: "timestamp",
       dataIndex: "timestamp",
     },
-    
   ];
   return (
     <Layout>

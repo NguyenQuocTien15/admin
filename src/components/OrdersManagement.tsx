@@ -14,7 +14,8 @@ const linkItems = [
   { href: "/deliveries/shipping", label: "Đang vận chuyển" },
   { href: "/deliveries/delivered", label: "Đã giao hàng" },
   { href: "/deliveries/fails", label: "Giao thất bại" },
-  { href: "/deliveries/returnorder", label: "Trả hàng" },
+  { href: "/deliveries/returnorder", label: "Trả kho" },
+  { href: "/deliveries/receivedBack", label: "Đã nhận lại hàng" },
 ];
 
 const OrdersManagement: React.FC = () => {

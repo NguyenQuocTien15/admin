@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout"; // Adjust path as needed
 import { HeadComponent } from "@/components";
-import { Table } from "antd";
 import {
   collection,
   doc,
   getDoc,
   getDocs,
   query,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { fs } from "@/firebase/firabaseConfig";
+import { Button, Space, Table, Tooltip } from "antd";
+import { title } from "process";
 
-const Fails: React.FC = () => {
+const ReceivedBack: React.FC = () => {
   const [orders, setOrders] = useState();
   const [loading, setLoading] = useState(true); // To manage loading state
 
@@ -20,7 +22,7 @@ const Fails: React.FC = () => {
     setLoading(true);
     try {
       const orderRef = collection(fs, "orders");
-      const q = query(orderRef, where("orderStatusId", "==", "7"));
+      const q = query(orderRef, where("orderStatusId", "==", "10"));
       const snapshot = await getDocs(q);
 
       const ordersData = snapshot.docs.map(async (doc) => {
@@ -129,7 +131,7 @@ const Fails: React.FC = () => {
       render: (text: string) => (
         <div
           style={{
-            backgroundColor: "red",
+            backgroundColor: "yellow",
             padding: "8px",
             borderRadius: 10,
             textAlign: "center",
@@ -150,12 +152,12 @@ const Fails: React.FC = () => {
       <div className="mt-3">
         <HeadComponent
           title="Order Management"
-          pageTitle="Giao thất bại"
+          pageTitle="Trả kho"
         ></HeadComponent>
       </div>
-      <Table columns={columns} dataSource={orders}></Table>
+      <Table dataSource={orders} columns={columns}></Table>
     </Layout>
   );
 };
 
-export default Fails;
+export default ReceivedBack;
