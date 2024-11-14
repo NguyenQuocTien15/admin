@@ -11,6 +11,9 @@ import { FaPercentage } from 'react-icons/fa';
 import { IoMdPricetag } from 'react-icons/io';
 import { AiOutlineBarChart } from 'react-icons/ai';
 import { SkinOutlined, UserAddOutlined } from '@ant-design/icons';
+import { SiZenn } from 'react-icons/si';
+import { GiClothes } from 'react-icons/gi';
+import { IoColorPalette } from 'react-icons/io5';
 
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -61,12 +64,22 @@ const SiderComponent = () => {
     {
       key: "products",
       label: <Link href={"/products"}>Products</Link>,
-      icon: <AiOutlineProduct />,
+      icon: <GiClothes />,
     },
     {
       key: "orderstatus",
       label: <Link href={"/orderstatus"}>Order Status</Link>,
       icon: <AiOutlineProduct />,
+    },
+    {
+      key: "sizes",
+      label: <Link href={"/sizes"}>Size</Link>,
+      icon: <SiZenn />,
+    },
+    {
+      key: "colors",
+      label: <Link href={"/colors"}>Colors</Link>,
+      icon: <IoColorPalette />,
     },
     {
       key: "statistics",
