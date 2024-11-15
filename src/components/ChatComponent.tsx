@@ -1,22 +1,32 @@
 import React, { Dispatch, SetStateAction, useEffect, useRef } from 'react';
-import { Timestamp as FirebaseTimestamp } from 'firebase/firestore';
 import { format } from 'date-fns';
-import styles from "../styles/chat.module.css"
-interface Message {
-  userId: string;
-  adminId: string;
+import { Timestamp } from 'firebase/firestore'; // Import Timestamp from Firebase SDK
+import styles from "../styles/chat.module.css";
+
+interface MessageModel {
+  id: string;
   message: string;
-  timestamp: FirebaseTimestamp;
+  sender_ID: string;
+  createdAt: Timestamp | Date | string | null; // createdAt can be Timestamp, Date, string, or null
 }
 
 interface ChatComponentProps {
   userId: string;
   adminId: string;
-  messages: Message[];
+  messages: MessageModel[];
   newMessage: string;
   setNewMessage: Dispatch<SetStateAction<string>>;
   onSendMessage: () => void;
 }
+
+// Hàm parse createdAt, nếu không hợp lệ thì trả về null
+const parseCreatedAt = (createdAt: any): Date | null => {
+  if (createdAt instanceof Timestamp) {
+    return createdAt.toDate(); // If it's a Timestamp, convert to Date
+  }
+  const parsedDate = new Date(createdAt);
+  return !isNaN(parsedDate.getTime()) ? parsedDate : null;
+};
 
 const ChatComponent: React.FC<ChatComponentProps> = ({
   userId,
@@ -27,34 +37,39 @@ const ChatComponent: React.FC<ChatComponentProps> = ({
   onSendMessage,
 }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
-// Tạo Firebase Timestamp (ví dụ)
-const firebaseTimestamp = FirebaseTimestamp.fromDate(new Date());
-  useEffect(() => {
-    // Auto-scroll to the bottom when a new message arrives
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
- 
+  useEffect(() => {
+    if (messages.length > 0) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
   return (
     <div className={styles.chatContainer}>
       <div className={styles.messagesContainer}>
-        {messages && Array.isArray(messages) && messages.length>0 ? ( messages.map((msg, index) => (
-          <div
-            key={index}
-            className={msg.userId  === userId  ? styles.userMessage  : styles.adminMessage}
-          >
-            <div className={styles.messageHeader}>
-              <span className={styles.timestamp}>
-              
-              </span>
-            </div>
-            <div>{msg.message}</div>
-          </div>
-        ))
-      ) : (
-          <div> No </div>
-          )}
+        {messages.length > 0 ? (
+          messages.map((msg) => {
+            const parsedDate = parseCreatedAt(msg.createdAt); // Safely parse createdAt to Date
+            const messageCreatedAt = parsedDate ? format(parsedDate, 'HH:mm') : 'N/A';
+
+            return (
+              <div
+                key={msg.id}
+                className={msg.sender_ID === userId ? styles.userMessage : styles.adminMessage}
+              >
+                
+                <div>{msg.message}</div>
+                <div className={styles.messageHeader}>
+                  <span className={styles.createdAt}>
+                    {messageCreatedAt || 'Chưa có thời gian'}
+                  </span>
+                </div>
+              </div>
+            );
+          })
+        ) : (
+          <div>No messages</div>
+        )}
         {/* Add a ref at the end to scroll to the latest message */}
         <div ref={messagesEndRef} />
       </div>

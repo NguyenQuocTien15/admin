@@ -1,3 +1,4 @@
+import { message } from 'antd';
 import { getFirestore, collection, query, where, getDocs, addDoc, serverTimestamp, orderBy, onSnapshot } from "firebase/firestore";
 import {fs} from "../firebase/firebaseConfig"
 
@@ -29,7 +30,7 @@ export async function getChatWithUser(userId: string): Promise<string | null> {
 // Hàm lấy tất cả tin nhắn của một cuộc trò chuyện
 export async function getMessagesForChat(chatId: string) {
   const messagesRef = collection(fs, `chats/${chatId}/messages`);
-  const q = query(messagesRef, orderBy("timestamp"));
+  const q = query(messagesRef, orderBy("createdAt"));
 
   const querySnapshot = await getDocs(q);
   const messages = querySnapshot.docs.map((doc) => ({
@@ -41,11 +42,11 @@ export async function getMessagesForChat(chatId: string) {
 }
 
 // Hàm gửi tin nhắn từ admin hoặc user
-export async function sendMessage(chatId: string, text: string, senderId: string) {
+export async function sendMessage(chatId: string, message: string, senderId: string) {
   const messagesRef = collection(fs, `chats/${chatId}/messages`);
 
   await addDoc(messagesRef, {
-    text,
+    message,
     sender_ID: senderId,
     timestamp: serverTimestamp()
   });
@@ -54,7 +55,7 @@ export async function sendMessage(chatId: string, text: string, senderId: string
 // Hàm lắng nghe tin nhắn theo thời gian thực
 export function listenToMessages(chatId: string, callback: (messages: any[]) => void) {
   const messagesRef = collection(fs, `chats/${chatId}/messages`);
-  const q = query(messagesRef, orderBy("timestamp"));
+  const q = query(messagesRef, orderBy("createdAt"));
 
   onSnapshot(q, (querySnapshot) => {
     const messages = querySnapshot.docs.map((doc) => ({

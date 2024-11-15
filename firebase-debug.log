@@ -1,0 +1,80 @@
+[debug] [2024-11-13T04:07:24.204Z] ----------------------------------------------------------------------
+[debug] [2024-11-13T04:07:24.213Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Tien\AppData\Local\Yarn\Data\global\node_modules\firebase-tools\lib\bin\firebase.js init functions
+[debug] [2024-11-13T04:07:24.214Z] CLI Version:   13.25.0
+[debug] [2024-11-13T04:07:24.214Z] Platform:      win32
+[debug] [2024-11-13T04:07:24.214Z] Node Version:  v22.3.0
+[debug] [2024-11-13T04:07:24.214Z] Time:          Wed Nov 13 2024 11:07:24 GMT+0700 (Indochina Time)
+[debug] [2024-11-13T04:07:24.214Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2024-11-13T04:07:24.334Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-11-13T04:07:24.336Z] > authorizing via signed-in user (nguyenquoctien08797@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  F:\shopping-project\admin
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2024-11-13T04:07:29.423Z] Using project from CLI flag: shopping-app-3-410c2
+[debug] [2024-11-13T04:07:29.426Z] Checked if tokens are valid: false, expires at: 1731471621912
+[debug] [2024-11-13T04:07:29.427Z] Checked if tokens are valid: false, expires at: 1731471621912
+[debug] [2024-11-13T04:07:29.427Z] > refreshing access token with scopes: []
+[debug] [2024-11-13T04:07:29.431Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2024-11-13T04:07:29.431Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2024-11-13T04:07:29.801Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2024-11-13T04:07:29.801Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2024-11-13T04:07:29.816Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/shopping-app-3-410c2 [none]
+[debug] [2024-11-13T04:07:30.268Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/shopping-app-3-410c2 200
+[debug] [2024-11-13T04:07:30.268Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/shopping-app-3-410c2 {"projectId":"shopping-app-3-410c2","projectNumber":"290622766088","displayName":"shopping-app-3","name":"projects/shopping-app-3-410c2","resources":{"hostingSite":"shopping-app-3-410c2","storageBucket":"shopping-app-3-410c2.appspot.com","locationId":"asia-east1"},"state":"ACTIVE","etag":"1_39cebc9d-47a8-4ab5-b18d-45e7d1b51ea7"}
+[info] i  Using project shopping-app-3-410c2 (shopping-app-3) 
+[info] 
+=== Functions Setup
+[debug] [2024-11-13T04:07:30.291Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2024-11-13T04:07:30.292Z] > authorizing via signed-in user (nguyenquoctien08797@gmail.com)
+[debug] [2024-11-13T04:07:30.292Z] [iam] checking project shopping-app-3-410c2 for permissions ["firebase.projects.get"]
+[debug] [2024-11-13T04:07:30.293Z] Checked if tokens are valid: true, expires at: 1731474448802
+[debug] [2024-11-13T04:07:30.293Z] Checked if tokens are valid: true, expires at: 1731474448802
+[debug] [2024-11-13T04:07:30.293Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/shopping-app-3-410c2:testIamPermissions [none]
+[debug] [2024-11-13T04:07:30.293Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/shopping-app-3-410c2:testIamPermissions x-goog-quota-user=projects/shopping-app-3-410c2
+[debug] [2024-11-13T04:07:30.293Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/shopping-app-3-410c2:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2024-11-13T04:07:31.449Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/shopping-app-3-410c2:testIamPermissions 200
+[debug] [2024-11-13T04:07:31.449Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/shopping-app-3-410c2:testIamPermissions {"permissions":["firebase.projects.get"]}
+[debug] [2024-11-13T04:07:31.450Z] Checked if tokens are valid: true, expires at: 1731474448802
+[debug] [2024-11-13T04:07:31.451Z] Checked if tokens are valid: true, expires at: 1731474448802
+[debug] [2024-11-13T04:07:31.451Z] Checked if tokens are valid: true, expires at: 1731474448802
+[debug] [2024-11-13T04:07:31.451Z] Checked if tokens are valid: true, expires at: 1731474448802
+[debug] [2024-11-13T04:07:31.451Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/shopping-app-3-410c2/services/cloudfunctions.googleapis.com [none]
+[debug] [2024-11-13T04:07:31.451Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/shopping-app-3-410c2/services/cloudfunctions.googleapis.com x-goog-quota-user=projects/shopping-app-3-410c2
+[debug] [2024-11-13T04:07:31.454Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/shopping-app-3-410c2/services/runtimeconfig.googleapis.com [none]
+[debug] [2024-11-13T04:07:31.455Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/shopping-app-3-410c2/services/runtimeconfig.googleapis.com x-goog-quota-user=projects/shopping-app-3-410c2
+[debug] [2024-11-13T04:07:33.113Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/shopping-app-3-410c2/services/runtimeconfig.googleapis.com 200
+[debug] [2024-11-13T04:07:33.113Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/shopping-app-3-410c2/services/runtimeconfig.googleapis.com [omitted]
+[debug] [2024-11-13T04:07:33.165Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/shopping-app-3-410c2/services/cloudfunctions.googleapis.com 200
+[debug] [2024-11-13T04:07:33.165Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/shopping-app-3-410c2/services/cloudfunctions.googleapis.com [omitted]
+[info] 
+Detected existing codebase(s): default
+
+[info] Let's create a new codebase for your functions.
+[info] A directory corresponding to the codebase will be created in your project
+[info] with sample code pre-configured.
+
+[info] See https://firebase.google.com/docs/functions/organize-functions for
+[info] more information on organizing your functions using codebases.
+
+[info] Functions can be deployed with firebase deploy.
+

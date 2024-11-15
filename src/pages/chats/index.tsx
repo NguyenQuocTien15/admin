@@ -21,6 +21,7 @@ const ChatAdmin = () => {
         id: doc.id,
         ...doc.data()
       }));
+      //@ts-ignore
       setUsers(userList);
     };
 

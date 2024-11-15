@@ -1,10 +1,7 @@
-interface Message {
-    id: string;
-    text: string;
-    sender: string;
-  }
-  interface ChatComponentProps {
-    userId: string;
-    adminId: string;
-  }
-  
+
+interface MessageModel {
+  id: string;
+  message: string;
+  sender_ID: string;
+  createdAt: Date | null;
+}
