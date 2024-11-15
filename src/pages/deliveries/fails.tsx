@@ -123,6 +123,11 @@ const Fails: React.FC = () => {
       dataIndex: "paymentMethodName",
     },
     {
+      title: "Reason",
+      key: "cancelReason",
+      dataIndex: "cancelReason",
+    },
+    {
       title: "Status",
       key: "orderStatusName",
       dataIndex: "orderStatusName",
