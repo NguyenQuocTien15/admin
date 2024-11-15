@@ -9,9 +9,12 @@ import { SizeModels } from "@/models/SizeModel";
 import { Button, Table } from "antd";
 import { ColumnProps } from "antd/es/table";
 import { collection, onSnapshot } from "firebase/firestore";
+import { useRouter } from "next/navigation";
+
 import { useEffect, useState } from "react";
 
 const Size = () => {
+  const router = useRouter();
   const [isVisibleModalAddSize, setIsVisibleModalAddSize] =
     useState(false);
   const [size, setSize] = useState<SizeModels[]>([]);
@@ -61,6 +64,10 @@ const Size = () => {
         visible={isVisibleModalAddSize}
         onClose={() => setIsVisibleModalAddSize(false)}
       />
+      <Button
+        type="primary"
+        onClick={() => router.push("/sizes/add-product")}
+      >Product</Button>
     </div>
   );
 };
