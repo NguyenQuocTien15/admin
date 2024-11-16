@@ -20,6 +20,7 @@ const AddNewProduct = () => {
   const [categories, setCategories] = useState<any[]>([]);
   const [brand, setBrand] = useState<any[]>([]);
   const [sizes, setSizes] = useState<any[]>([]);
+  const [colors, setColors] = useState<any[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [colorData, setColorData] = useState<any>({}); // Track sizes and images for each color
   const [form] = Form.useForm();
@@ -31,6 +32,7 @@ const AddNewProduct = () => {
     getCategories();
     getSizes();
     getBrands();
+    getColors();
   }, [id]);
 
   const getProductDetail = async (id: string) => {
@@ -70,34 +72,18 @@ const AddNewProduct = () => {
         snap.docs.map((doc) => ({ value: doc.id, label: doc.data().sizeName }))
       );
     });
-  };
-  
-
-
-  // const handleAddNewProduct = async (values: any) => {
-  //   setIsLoading(true);
-  //   try {
-  //     const data = {
-  //       ...values,
-  //       colorData,
-  //       createdAt: Date.now(),
-  //       updatedAt: Date.now(),
-  //     };
-  //     const snap = await addDoc(collection(fs, "products"), data);
-
-  //     if (files.length > 0) {
-  //       HandleFile.HandleFiles(files, snap.id, "products"); // Assuming this uploads images
-  //     }
-
-  //     setIsLoading(false);
-  //     message.success("Product added successfully!");
-  //     form.resetFields();
-  //     setColorData({});
-  //   } catch (error: any) {
-  //     message.error(error.message);
-  //     setIsLoading(false);
-  //   }
-  // };
+  }; 
+ const getColors = () => {
+  onSnapshot(collection(fs, "colors"), (snap) => {
+    setColors(
+      snap.docs.map((doc) => ({
+        value: doc.id,
+        label: doc.data().colorName,
+        colorCode: doc.data().colorCode, // Assuming there's a colorCode field
+      }))
+    );
+  });
+};
 
   const handleAddNewProduct = async (values: any) => {
     setIsLoading(true);
@@ -109,7 +95,7 @@ const AddNewProduct = () => {
 
     const productData: any = {
       ...values,
-      color: selectedColors,
+      colors: selectedColors,
       sizeQuantities, // Include sizeQuantities in productData
       createdAt: Date.now(),
       updatedAt: Date.now(),
@@ -117,20 +103,20 @@ const AddNewProduct = () => {
 
     try {
       const uploadedColorImages = await Promise.all(
-        selectedColors.map(async (color) => {
-          if (colorData[color].image) {
+        selectedColors.map(async (colors) => {
+          if (colorData[colors].image) {
             const imageUrl = await HandleFile.uploadSingleFile(
-              colorData[color].image,
-              `products/${color}`
+              colorData[colors].image,
+              `products/${colors}`
             );
-            return { color, imageUrl };
+            return { colors, imageUrl };
           }
           return null;
         })
       );
 
       productData.colorImages = uploadedColorImages.reduce((acc, item) => {
-        if (item) acc[item.color] = item.imageUrl;
+        if (item) acc[item.colors] = item.imageUrl;
         return acc;
       }, {});
 
@@ -153,44 +139,46 @@ const AddNewProduct = () => {
     setSelectedColors(selectedValues);
     setColorData((prev: any) => {
       const updatedData = { ...prev };
-      selectedValues.forEach((color) => {
-        if (!updatedData[color]) {
-          updatedData[color] = { sizes: {}, image: null };
+      selectedValues.forEach((colors) => {
+        if (!updatedData[colors]) {
+          updatedData[colors] = { sizes: {}, image: null };
         }
       });
-      Object.keys(updatedData).forEach((color) => {
-        if (!selectedValues.includes(color)) {
-          delete updatedData[color];
+      Object.keys(updatedData).forEach((colors) => {
+        if (!selectedValues.includes(colors)) {
+          delete updatedData[colors];
         }
       });
       return updatedData;
     });
   };
 
-  const handleSizeChangeForColor = (color: string, selectedSizes: string[]) => {
-    setColorData((prev: { [x: string]: { sizes: { [x: string]: number; }; }; }) => ({
-      ...prev,
-      [color]: {
-        ...prev[color],
-        sizes: selectedSizes.reduce((acc: any, sizeId: string) => {
-          acc[sizeId] = prev[color]?.sizes[sizeId] || 0;
-          return acc;
-        }, {}),
-      },
-    }));
+  const handleSizeChangeForColor = (colors: string, selectedSizes: string[]) => {
+    setColorData(
+      (prev: { [x: string]: { sizes: { [x: string]: number } } }) => ({
+        ...prev,
+        [colors]: {
+          ...prev[colors],
+          sizes: selectedSizes.reduce((acc: any, sizeId: string) => {
+            acc[sizeId] = prev[colors]?.sizes[sizeId] || 0;
+            return acc;
+          }, {}),
+        },
+      })
+    );
   };
 
   const handleQuantityChange = (
-    color: string,
+    colors: string,
     sizeId: string,
     quantity: number
   ) => {
     setColorData((prev: { [x: string]: { sizes: any; }; }) => ({
       ...prev,
-      [color]: {
-        ...prev[color],
+      [colors]: {
+        ...prev[colors],
         sizes: {
-          ...prev[color].sizes,
+          ...prev[colors].sizes,
           [sizeId]: quantity,
         },
       },
@@ -216,7 +204,9 @@ const AddNewProduct = () => {
         <Form.Item name="title" label="Title" rules={[{ required: true }]}>
           <Input placeholder="Product title" />
         </Form.Item>
-
+        <Form.Item name={"type"} label="Type">
+          <Input />
+        </Form.Item>
         <Form.Item name="categories" label="Categories">
           <Select mode="multiple" options={categories} />
         </Form.Item>
@@ -225,32 +215,49 @@ const AddNewProduct = () => {
           <Select options={brand} />
         </Form.Item>
 
-        <Form.Item name="price" label="Price">
+        <Form.Item name="importPrice" label="Import Price">
           <Input type="number" />
         </Form.Item>
-
-        {/* Color Selection */}
+        <Form.Item name="sellingPrice" label="Selling Price">
+          <Input type="number" />
+        </Form.Item>
         <Form.Item name="colors" label="Colors">
           <Select
             mode="multiple"
-            value={selectedColors}
+            options={colors.map((colors) => ({
+              value: colors.value,
+              label: (
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: 16,
+                      height: 16,
+                      backgroundColor: colors.colorCode || "#000",
+                      marginRight: 8,
+                    }}
+                  />
+                  {colors.label}
+                </div>
+              ),
+            }))}
             onChange={handleColorChange}
           />
         </Form.Item>
 
         {/* Render Sizes and Quantities for Each Selected Color */}
-        {selectedColors.map((color) => (
-          <div key={color}>
-            <h4>{`Settings for color: ${color}`}</h4>
+        {selectedColors.map((colors) => (
+          <div key={colors}>
+            <h4>{`Settings for color: ${colors}`}</h4>
             <Form.Item label="Select Sizes">
               <Select
                 mode="multiple"
-                onChange={(sizes) => handleSizeChangeForColor(color, sizes)}
+                onChange={(sizes) => handleSizeChangeForColor(colors, sizes)}
                 options={sizes}
               />
             </Form.Item>
 
-            {Object.keys(colorData[color]?.sizes || {}).map((sizeId) => (
+            {Object.keys(colorData[colors]?.sizes || {}).map((sizeId) => (
               <Form.Item
                 key={sizeId}
                 label={`Quantity for size ${
@@ -259,10 +266,10 @@ const AddNewProduct = () => {
               >
                 <Input
                   type="number"
-                  value={colorData[color].sizes[sizeId]}
+                  value={colorData[colors].sizes[sizeId]}
                   onChange={(e) =>
                     handleQuantityChange(
-                      color,
+                      colors,
                       sizeId,
                       parseInt(e.target.value)
                     )
@@ -271,21 +278,35 @@ const AddNewProduct = () => {
               </Form.Item>
             ))}
 
-            <Form.Item label={`Image for color ${color}`}>
+            <Form.Item label={`Image for color ${colors}`}>
               <ImagePicker
                 onSelected={(files) =>
-                  handleImageUploadForColor(color, files[0])
+                  handleImageUploadForColor(colors, files[0])
                 }
               />
-              {colorData[color]?.image && (
+              {colorData[colors]?.image && (
                 <Image
-                  src={URL.createObjectURL(colorData[color].image)}
+                  src={URL.createObjectURL(colorData[colors].image)}
                   width={100}
                 />
               )}
             </Form.Item>
           </div>
         ))}
+
+       
+        <Form.Item label="Product Image">
+          <ImagePicker
+            onSelected={(files) => {
+              if (files.length > 0) {
+                const file = files[0];
+                setImgUrl(URL.createObjectURL(file)); // Preview the image
+                setFiles([file]); // Save the file for uploading
+              }
+            }}
+          />
+          {imgUrl && <Image src={imgUrl} width={100} />}
+        </Form.Item>
 
         <Button type="primary" htmlType="submit" loading={isLoading}>
           Publish
