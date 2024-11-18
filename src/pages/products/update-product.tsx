@@ -351,30 +351,6 @@ const handleUpdateProduct = async (values: any) => {
                 </Form.Item>
               </div>
             ))}
-
-            {Object.keys(colorData[color]?.sizes || {}).map((sizeId) => (
-              <div key={sizeId} style={{ marginBottom: 16 }}>
-                <Form.Item
-                  label={`Size: ${
-                    sizes.find((size) => size.value === sizeId)?.label ||
-                    "Unknown"
-                  }`}
-                >
-                  <Input
-                    type="number"
-                    placeholder="Enter quantity"
-                    value={colorData[color]?.sizes[sizeId] || 0}
-                    onChange={(e) =>
-                      handleQuantityChange(
-                        color,
-                        sizeId,
-                        parseInt(e.target.value, 10)
-                      )
-                    }
-                  />
-                </Form.Item>
-              </div>
-            ))}
           </div>
         ))}
 
