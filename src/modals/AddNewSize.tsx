@@ -34,9 +34,10 @@ const AddNewSize = (props: Props) => {
     setIsLoading(true);
 
     try {
-      // Sử dụng setDoc để tạo tài liệu mới với ID được chỉ định
+      // Sử dụng setDoc để tạo tài liệu mới với ID được chỉ định và thêm trường 'id' kiểu int
       await setDoc(doc(fs, "sizes", sizeId), {
         sizeName,
+        id: parseInt(sizeId, 10), // Thêm trường id kiểu int
         createdAt: Date.now(),
         updatedAt: Date.now(),
       });
@@ -48,6 +49,7 @@ const AddNewSize = (props: Props) => {
       setIsLoading(false);
     }
   };
+
 
   return (
     <Modal

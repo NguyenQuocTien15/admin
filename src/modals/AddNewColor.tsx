@@ -27,51 +27,54 @@ const AddNewColor = (props: Props) => {
     onClose();
   };
 
-  const handleAddNewColor = async () => {
-    if (!colorName) {
-      message.error("Missing color name");
-      return;
-    }
+ const handleAddNewColor = async () => {
+   if (!colorName) {
+     message.error("Missing color name");
+     return;
+   }
 
-    setIsLoading(true);
+   setIsLoading(true);
 
-    try {
-      // Start a Firestore transaction to handle atomic increment of the color_id
-      const colorRef = doc(fs, "counters", "color_id_counter");
-      await runTransaction(fs, async (transaction) => {
-        const colorDoc = await transaction.get(colorRef);
+   try {
+     // Start a Firestore transaction to handle atomic increment of the color_id
+     const colorRef = doc(fs, "counters", "color_id_counter");
+     await runTransaction(fs, async (transaction) => {
+       const colorDoc = await transaction.get(colorRef);
 
-        if (!colorDoc.exists()) {
-          // If the counter doesn't exist, initialize it with a value of 1
-          transaction.set(colorRef, { lastId: 1 });
-          // Use 1 as the color_id
-          await setDoc(doc(fs, "colors", "1"), {
-            colorName,
-            colorCode,
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-          });
-        } else {
-          // Increment the lastId counter and use the new value
-          const newColorId = colorDoc.data()?.lastId + 1;
-          transaction.update(colorRef, { lastId: newColorId });
+       if (!colorDoc.exists()) {
+         // If the counter doesn't exist, initialize it with a value of 1
+         transaction.set(colorRef, { lastId: 1 });
+         // Use 1 as the color_id and add it to the document data
+         await setDoc(doc(fs, "colors", "1"), {
+           id: 1, // Include the id field
+           colorName,
+           colorCode,
+           createdAt: Date.now(),
+           updatedAt: Date.now(),
+         });
+       } else {
+         // Increment the lastId counter and use the new value
+         const newColorId = colorDoc.data()?.lastId + 1;
+         transaction.update(colorRef, { lastId: newColorId });
 
-          await setDoc(doc(fs, "colors", newColorId.toString()), {
-            colorName,
-            colorCode,
-            createdAt: Date.now(),
-            updatedAt: Date.now(),
-          });
-        }
-      });
+         await setDoc(doc(fs, "colors", newColorId.toString()), {
+           id: newColorId, // Include the id field
+           colorName,
+           colorCode,
+           createdAt: Date.now(),
+           updatedAt: Date.now(),
+         });
+       }
+     });
 
-      handleClose();
-    } catch (error: any) {
-      message.error(error.message);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+     handleClose();
+   } catch (error: any) {
+     message.error(error.message);
+   } finally {
+     setIsLoading(false);
+   }
+ };
+
 
   return (
     <Modal
