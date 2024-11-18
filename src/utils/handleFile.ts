@@ -1,6 +1,7 @@
 import {
   deleteObject,
   getDownloadURL,
+  getStorage,
   ref,
   uploadBytes,
 } from "firebase/storage";
@@ -18,6 +19,26 @@ import {
 import { handleResize } from "./resizeImage";
 
 export class HandleFile {
+  static async upload(file: any, path: string): Promise<string> {
+    try {
+      if (!file) {
+        throw new Error("No file provided for upload.");
+      }
+
+      const storage = getStorage(); // Initialize Firebase Storage
+      const storageRef = ref(storage, `${path}/${file.name || Date.now()}`);
+
+      // Upload the file to Firebase Storage
+      const snapshot = await uploadBytes(storageRef, file);
+
+      // Get the download URL of the uploaded file
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      return downloadURL;
+    } catch (error) {
+      console.error("File upload failed:", error);
+      throw new Error("Failed to upload file.");
+    }
+  }
   static async uploadSingleFile(file: any, path: string): Promise<string> {
     try {
       const resizedFile = await handleResize(file); // Resize the image if necessary
