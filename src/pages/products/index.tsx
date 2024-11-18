@@ -1,5 +1,14 @@
-import React, { useEffect, useState } from "react";
-import { Table, message, Image, Space, Tooltip, Button, Modal } from "antd";
+/** @format */
+
+import { HeadComponent } from "@/components";
+import AvatarComponent from "@/components/AvatarComponent";
+import BrandComponent from "@/components/BrandComponent";
+import CategoryComponent from "@/components/CategoryComponent";
+import OfferComponent from "@/components/OfferComponent";
+import { fs } from "@/firebase/firebaseConfig";
+import { ProductModel } from "@/models/ProductModel";
+import { Button, message, Modal, Space, Table, Tag, Tooltip, Image } from "antd";
+import { ColumnProps } from "antd/es/table";
 import {
   collection,
   getDocs,
@@ -7,11 +16,11 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import { fs } from "@/firebase/firabaseConfig";
 import Router from "next/router";
 import { FaEdit } from "react-icons/fa";
 import { DeleteOutlined } from "@ant-design/icons";
-import { HeadComponent } from "@/components";
+import { useEffect, useState } from "react";
+
 
 const DisplayProduct = () => {
   const [products, setProducts] = useState<[]>([]);
@@ -235,6 +244,18 @@ const DisplayProduct = () => {
       key: "importPrice",
       render: (price: number) => (price ? `$${price}` : "N/A"),
       width: 75,
+    },
+   
+    {
+      key: "offer",
+      title: "Offer",
+      dataIndex: "offer",
+      render: (offerId) =>
+        offerId ? (
+          <OfferComponent id={offerId} />
+        ) : (
+          "N/A"
+        ),
     },
     {
       title: "S-Price",

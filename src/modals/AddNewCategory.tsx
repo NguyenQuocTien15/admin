@@ -1,7 +1,7 @@
 /** @format */
 
 import { ImagePicker } from '@/components';
-import { fs } from '@/firebase/firabaseConfig';
+import { fs } from '@/firebase/firebaseConfig';
 import { HandleFile } from '@/utils/handleFile';
 import { Form, Input, Modal, message } from 'antd';
 import { addDoc, collection } from 'firebase/firestore';

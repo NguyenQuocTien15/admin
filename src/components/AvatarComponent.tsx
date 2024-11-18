@@ -1,6 +1,6 @@
 /** @format */
 
-import { fs } from '@/firebase/firabaseConfig';
+import { fs } from '@/firebase/firebaseConfig';
 import { Avatar } from 'antd';
 import { doc, getDoc } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react';

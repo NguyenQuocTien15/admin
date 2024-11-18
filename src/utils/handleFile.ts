@@ -6,7 +6,7 @@ import {
   uploadBytes,
 } from "firebase/storage";
 import { replaceName } from "./replaceName";
-import { fs, storage } from "@/firebase/firabaseConfig";
+
 import {
   addDoc,
   arrayUnion,
@@ -17,6 +17,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { handleResize } from "./resizeImage";
+import { fs, storage } from "@/firebase/firebaseConfig";
 
 export class HandleFile {
   static async upload(file: any, path: string): Promise<string> {

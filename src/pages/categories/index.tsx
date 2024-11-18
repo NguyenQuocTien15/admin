@@ -2,7 +2,7 @@
 
 import { HeadComponent } from '@/components';
 import AvatarComponent from '@/components/AvatarComponent';
-import { fs } from '@/firebase/firabaseConfig';
+import { fs } from '@/firebase/firebaseConfig';
 import { AddNewCategory } from '@/modals';
 import { CategoryModel } from '@/models/CategoryModel';
 import { Button, Table } from 'antd';

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Form, Input, Select, Button, Card, Image, message } from "antd";
 import { useSearchParams } from "next/navigation";
-import { fs } from "@/firebase/firabaseConfig";
+
 import {
   addDoc,
   collection,
@@ -11,6 +11,7 @@ import {
 } from "firebase/firestore";
 import ImagePicker from "@/components/ImagePicker"; // Assuming this is a custom component
 import { HandleFile } from "@/utils/handleFile";
+import { fs } from "@/firebase/firebaseConfig";
 
 const AddNewProduct = () => {
   const [isLoading, setIsLoading] = useState(false);

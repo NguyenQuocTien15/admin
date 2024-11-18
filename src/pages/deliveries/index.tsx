@@ -1,6 +1,6 @@
 import { HeadComponent } from "@/components";
 import Layout from "@/components/Layout";
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 
 import { Button, Space, Table, Tooltip } from "antd";
 import {
