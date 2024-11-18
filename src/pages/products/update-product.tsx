@@ -1,5 +1,5 @@
 import { Form, Input, Select, Button, Card, Image, message } from "antd";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { fs } from "@/firebase/firabaseConfig";
 import {
   addDoc,
@@ -26,6 +26,7 @@ const UpdateProduct = () => {
   const [form] = Form.useForm();
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
+  const router = useRouter();
 
   useEffect(() => {
     if (id) {
@@ -160,6 +161,8 @@ const handleUpdateProduct = async (values: any) => {
     await setDoc(productDoc, productData, { merge: true });
 
     message.success("Product updated successfully!");
+    window.history.back();
+    form.resetFields()
   } catch (error: any) {
     console.error("Error updating product:", error);
     message.error(`Failed to update product: ${error.message}`);
