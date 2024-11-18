@@ -1,231 +1,331 @@
-/** @format */
-
-import { HeadComponent, ImagePicker } from '@/components';
-import { fs } from '@/firebase/firabaseConfig';
-import { AddNewCategory } from '@/modals';
-import { HandleFile } from '@/utils/handleFile';
-import { Button, Card, Form, Image, Input, Select, message } from 'antd';
+import { useState, useEffect } from "react";
+import { Form, Input, Select, Button, Card, Image, message } from "antd";
+import { useSearchParams } from "next/navigation";
+import { fs } from "@/firebase/firabaseConfig";
 import {
-	addDoc,
-	collection,
-	doc,
-	getDoc,
-	onSnapshot,
-	updateDoc,
-} from 'firebase/firestore';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { BiAddToQueue } from 'react-icons/bi';
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+} from "firebase/firestore";
+import ImagePicker from "@/components/ImagePicker"; // Assuming this is a custom component
+import { HandleFile } from "@/utils/handleFile";
 
 const AddNewProduct = () => {
-	const [isLoading, setIsLoading] = useState(false);
-	const [files, setFiles] = useState<any[]>([]);
-	const [imgUrl, setImgUrl] = useState('');
-	const [categories, setCategories] = useState<any[]>([]);
-	const [brand, setBrand] = useState<any[]>([]);
-	const [isVisibleModalAddCategory, setIsVisibleModalAddCategory] =
-		useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [files, setFiles] = useState<any[]>([]);
+  const [imgUrl, setImgUrl] = useState("");
+  const [categories, setCategories] = useState<any[]>([]);
+  const [brand, setBrand] = useState<any[]>([]);
+  const [sizes, setSizes] = useState<any[]>([]);
+  const [colors, setColors] = useState<any[]>([]);
+  const [selectedColors, setSelectedColors] = useState<string[]>([]);
+  const [colorData, setColorData] = useState<any>({}); // Track sizes and images for each color
+  const [form] = Form.useForm();
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
 
-	const [form] = Form.useForm();
-	const searchParams = useSearchParams();
-	const id = searchParams.get('id');
-
-	useEffect(() => {
-		id && getProductDetail(id);
-	}, [id]);
-
-	useEffect(() => {
-		getCategories();
-	}, []);
-	useEffect(() => {
+  useEffect(() => {
+    id && getProductDetail(id);
+    getCategories();
+    getSizes();
     getBrands();
-  }, []);
+    getColors();
+  }, [id]);
 
-	const getProductDetail = async (id: string) => {
-		try {
-			const snap = await getDoc(doc(fs, `products/${id}`));
-			if (snap.exists()) {
-				const data = snap.data();
-
-				form.setFieldsValue(data);
-
-				if (data.imageUrl) {
-					setImgUrl(data.imageUrl);
-				}
-			} else {
-			}
-		} catch (error) {
-			console.log(error);
-		}
-	};
-
-	const handleAddNewProduct = async (values: any) => {
-		setIsLoading(true);
-
-		const data: any = {};
-
-		for (const i in values) {
-			data[`${i}`] = values[i] ?? '';
-		}
-
-		try {
-			data.updatedAt = Date.now();
-
-			const snap = id
-				? await updateDoc(doc(fs, `products/${id}`), data)
-				: await addDoc(collection(fs, 'products'), {
-						...data,
-						createdAt: Date.now(),
-						rate: 0,
-				  });
-
-			if (files && (snap || id)) {
-				HandleFile.HandleFiles(
-					files,
-					id ? id : snap ? snap.id : '',
-					'products'
-				);
-			}
-			setIsLoading(false);
-			window.history.back();
-			form.resetFields();
-		} catch (error: any) {
-			message.error(error.message);
-			setIsLoading(false);
-		}
-	};
-
-	const getCategories = () => {
-		onSnapshot(collection(fs, 'categories'), (snap) => {
-			if (snap.empty) {
-				console.log('Data not found!');
-				setCategories([]);
-			} else {
-				const items: any[] = [];
-
-				snap.forEach((item: any) => {
-					items.push({
-						value: item.id,
-						label: item.data().title,
-					});
-				});
-
-				setCategories(items);
-			}
-		});
-	};
-const getBrands = () => {
-  onSnapshot(collection(fs, "brands"), (snap) => {
-    if (snap.empty) {
-      console.log("Data not found!");
-      setBrand([]);
-    } else {
-      const items: any[] = [];
-
-      snap.forEach((item: any) => {
-        items.push({
-          value: item.id,
-          label: item.data().title,
-        });
-      });
-
-      setBrand(items);
+  const getProductDetail = async (id: string) => {
+    try {
+      const snap = await getDoc(doc(fs, `products/${id}`));
+      if (snap.exists()) {
+        const data = snap.data();
+        form.setFieldsValue(data);
+        setImgUrl(data.imageUrl || "");
+        setSelectedColors(data.color || []);
+        setColorData(data.colorData || {}); // Make sure the colorData includes sizes and quantities
+      }
+    } catch (error) {
+      console.error(error);
     }
-  });
-};
-	return (
-    <div>
-      <HeadComponent
-        title="Add new product"
-        pageTitle="Add new product"
-        extra={
-          <Button
-            type="primary"
-            onClick={() => setIsVisibleModalAddCategory(true)}
-            icon={<BiAddToQueue size={22} />}
-          >
-            Add new category
-          </Button>
+  };
+
+  const getCategories = () => {
+    onSnapshot(collection(fs, "categories"), (snap) => {
+      setCategories(
+        snap.docs.map((doc) => ({ value: doc.id, label: doc.data().title }))
+      );
+    });
+  };
+
+  const getBrands = () => {
+    onSnapshot(collection(fs, "brands"), (snap) => {
+      setBrand(
+        snap.docs.map((doc) => ({ value: doc.id, label: doc.data().title }))
+      );
+    });
+  };
+
+  const getSizes = () => {
+    onSnapshot(collection(fs, "sizes"), (snap) => {
+      setSizes(
+        snap.docs.map((doc) => ({ value: doc.id, label: doc.data().sizeName }))
+      );
+    });
+  };
+  const getColors = () => {
+    onSnapshot(collection(fs, "colors"), (snap) => {
+      setColors(
+        snap.docs.map((doc) => ({
+          value: doc.id,
+          label: doc.data().colorName,
+          colorCode: doc.data().colorCode, // Assuming there's a colorCode field
+        }))
+      );
+    });
+  };
+
+  const handleAddNewProduct = async (values: any) => {
+    setIsLoading(true);
+
+    // Transform the color data to match the desired structure
+    const variations = await Promise.all(
+      selectedColors.map(async (color) => {
+        // Upload the image for each color and wait for the URL
+        const colorCode =
+          colors.find((c) => c.value === color)?.colorCode || "defaultColor";
+        const imageUrl = colorData[color]?.image
+          ? await HandleFile.uploadSingleFile(
+              colorData[color].image,
+              `products/${color}`
+            )
+          : "";
+
+        const colorSizes = Object.keys(colorData[color]?.sizes || {}).map(
+          (sizeId) => {
+            return {
+              sizeId: parseInt(sizeId, 10), // Convert sizeId to an integer
+
+              quantity: colorData[color]?.sizes[sizeId] || 0,
+            };
+          }
+        );
+
+        return {
+          color,
+          image: imageUrl, // Ensure image URL is resolved before saving to Firestore
+          sizes: colorSizes,
+          colorCode,
+        };
+      })
+    );
+
+    const productData = {
+      ...values,
+      variations, // Include the variations array in the product data
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+
+    try {
+      // Upload product data to Firestore
+      const productRef = await addDoc(collection(fs, "products"), productData);
+
+      // Upload additional files if any
+      if (files.length > 0) {
+        await HandleFile.HandleFiles(files, productRef.id, "products");
+      }
+
+      setIsLoading(false);
+      window.history.back()
+      form.resetFields();
+      message.success("Product added successfully!");
+    } catch (error: any) {
+      message.error(`Failed to add product: ${error.message}`);
+      setIsLoading(false);
+    }
+  };
+
+  const handleColorChange = (selectedValues: string[]) => {
+    setSelectedColors(selectedValues);
+    setColorData((prev: any) => {
+      const updatedData = { ...prev };
+      selectedValues.forEach((color) => {
+        if (!updatedData[color]) {
+          updatedData[color] = { sizes: {}, image: null };
         }
-      />
-      <div className="col-md-8 offset-md-2">
-        <Card title="Form add new">
-          <Form
-            disabled={isLoading}
-            size="large"
-            form={form}
-            layout="vertical"
-            onFinish={handleAddNewProduct}
-          >
-            <Form.Item
-              name={"title"}
-              label="Title"
-              rules={[
-                {
-                  required: true,
-                  message: "What is products title",
-                },
-              ]}
-            >
-              <Input placeholder="Title" maxLength={150} allowClear />
-            </Form.Item>
-            <Form.Item name={"type"} label="Type">
-              <Input />
-            </Form.Item>
-            <Form.Item name={"categories"} label="Categories">
-              <Select mode="multiple" options={categories} />
-            </Form.Item>
-            <Form.Item name={"brand"} label="Brand">
-              <Select options={brand} />
-            </Form.Item>
-            <Form.Item name={"description"} label="Description">
-              <Input.TextArea rows={3} />
-            </Form.Item>
-            <Form.Item name={"price"} label="Price">
-              <Input type="number" />
-            </Form.Item>
-          </Form>
+      });
+      Object.keys(updatedData).forEach((color) => {
+        if (!selectedValues.includes(color)) {
+          delete updatedData[color];
+        }
+      });
+      return updatedData;
+    });
+  };
 
-          {files.length > 0 && (
-            <div>
-              <img
-                src={URL.createObjectURL(files[0])}
-                style={{
-                  width: 200,
-                  height: "auto",
-                }}
-                alt=""
-              />
-            </div>
-          )}
+  const handleSizeChangeForColor = (
+    colors: string,
+    selectedSizes: string[]
+  ) => {
+    setColorData(
+      (prev: { [x: string]: { sizes: { [x: string]: number } } }) => ({
+        ...prev,
+        [colors]: {
+          ...prev[colors],
+          sizes: selectedSizes.reduce((acc: any, sizeId: string) => {
+            acc[sizeId] = prev[colors]?.sizes[sizeId] || 0;
+            return acc;
+          }, {}),
+        },
+      })
+    );
+  };
 
-          {files.length === 0 && imgUrl ? (
-            <Image src={imgUrl} style={{ width: 200 }} />
-          ) : (
-            <></>
-          )}
-          <ImagePicker
-            loading={isLoading}
-            onSelected={(vals) => setFiles(vals)}
+  const handleQuantityChange = (
+    colors: string,
+    sizeId: string,
+    quantity: number
+  ) => {
+    setColorData((prev: { [x: string]: { sizes: any } }) => ({
+      ...prev,
+      [colors]: {
+        ...prev[colors],
+        sizes: {
+          ...prev[colors].sizes,
+          [sizeId]: quantity,
+        },
+      },
+    }));
+  };
+
+  const handleImageUploadForColor = (color: string, file: any) => {
+    if (file instanceof Blob) {
+      // Check if file is a Blob (File is a subclass of Blob)
+      setColorData((prev: { [x: string]: any }) => ({
+        ...prev,
+        [color]: { ...prev[color], image: file },
+      }));
+    } else {
+      console.error("Invalid file type");
+    }
+  };
+
+  return (
+    <Card title="Add New Product">
+      <Form form={form} layout="vertical" onFinish={handleAddNewProduct}>
+        <Form.Item name="title" label="Title" rules={[{ required: true }]}>
+          <Input placeholder="Product title" />
+        </Form.Item>
+        <Form.Item name={"type"} label="Type">
+          <Input />
+        </Form.Item>
+        <Form.Item name="categories" label="Categories">
+          <Select mode="multiple" options={categories} />
+        </Form.Item>
+
+        <Form.Item name="brand" label="Brand">
+          <Select options={brand} />
+        </Form.Item>
+        <Form.Item name={"description"} label="Description">
+          <Input.TextArea rows={3} />
+        </Form.Item>
+        <Form.Item name="importPrice" label="Import Price">
+          <Input type="number" />
+        </Form.Item>
+        <Form.Item name="price" label="Selling Price">
+          <Input type="number" />
+        </Form.Item>
+        <Form.Item name="colors" label="Colors">
+          <Select
+            mode="multiple"
+            options={colors.map((colors) => ({
+              value: colors.value,
+              label: (
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      width: 16,
+                      height: 16,
+                      backgroundColor: colors.colorCode || "#000",
+                      marginRight: 8,
+                    }}
+                  />
+                  {colors.label}
+                </div>
+              ),
+            }))}
+            onChange={handleColorChange}
           />
+        </Form.Item>
 
-          <div className="mt-3 text-right">
-            <Button
-              loading={isLoading}
-              onClick={() => form.submit()}
-              type="primary"
-            >
-              Publish
-            </Button>
+        {selectedColors.map((color) => (
+          <div key={color}>
+            <h4>{`Settings for color: ${color}`}</h4>
+            <Form.Item label="Select Sizes">
+              <Select
+                mode="multiple"
+                value={Object.keys(colorData[color]?.sizes || {})}
+                onChange={(sizes) => handleSizeChangeForColor(color, sizes)}
+                options={sizes}
+              />
+            </Form.Item>
+
+            {Object.keys(colorData[color]?.sizes || {}).map((sizeId) => (
+              <Form.Item
+                key={sizeId}
+                label={`Quantity for size ${
+                  sizes.find((size) => size.value === sizeId)?.label
+                }`}
+              >
+                <Input
+                  type="number"
+                  value={colorData[color].sizes[sizeId]}
+                  onChange={(e) =>
+                    handleQuantityChange(
+                      color,
+                      sizeId,
+                      parseInt(e.target.value)
+                    )
+                  }
+                />
+              </Form.Item>
+            ))}
+
+            <Form.Item label={`Image for color ${color}`}>
+              <ImagePicker
+                onSelected={(files) =>
+                  handleImageUploadForColor(color, files[0])
+                }
+              />
+              {colorData[color]?.image && (
+                <Image
+                  src={URL.createObjectURL(colorData[color].image)}
+                  width={100}
+                />
+              )}
+            </Form.Item>
           </div>
-        </Card>
-      </div>
+        ))}
 
-      <AddNewCategory
-        visible={isVisibleModalAddCategory}
-        onClose={() => setIsVisibleModalAddCategory(false)}
-      />
-    </div>
+        <Form.Item label="Product Image">
+          <ImagePicker
+            onSelected={(files) => {
+              if (files.length > 0) {
+                const file = files[0];
+                setImgUrl(URL.createObjectURL(file)); // Preview the image
+                setFiles([file]); // Save the file for uploading
+              }
+            }}
+          />
+          {imgUrl && <Image src={imgUrl} width={100} />}
+        </Form.Item>
+
+        <Button type="primary" htmlType="submit" loading={isLoading}>
+          Publish
+        </Button>
+      </Form>
+    </Card>
   );
 };
 
