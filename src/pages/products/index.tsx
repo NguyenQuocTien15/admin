@@ -290,7 +290,7 @@ const DisplayProduct = () => {
             <Button
               type="text"
               icon={<FaEdit color="green" size={20} />}
-              onClick={() => Router.push(`/sizes/update-product?id=${item.id}`)}
+              onClick={() => Router.push(`/products/update-product?id=${item.id}`)}
             />
           </Tooltip>
           <Tooltip title="Delete product">
@@ -314,7 +314,7 @@ const DisplayProduct = () => {
         extra={
           <Button
             type="primary"
-            onClick={() => Router.push("/sizes/add-product")}
+            onClick={() => Router.push("/products/add-new-product")}
           >
             Add product
           </Button>

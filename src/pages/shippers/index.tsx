@@ -6,13 +6,9 @@ import { ShipperModel } from "@/models/ShipperModel";
 import AddNewShipper from "@/modals/AddNewShipper";
 import Table, { ColumnProps } from "antd/es/table";
 import { collection, onSnapshot } from "firebase/firestore";
-<<<<<<< HEAD
 import { fs } from "@/firebase/firebaseConfig";
-=======
-import { fs } from "@/firebase/firabaseConfig";
 import { BiTrash } from "react-icons/bi";
 import { EditFilled } from "@ant-design/icons";
->>>>>>> f259d392990f95a535f20d9cf46a4deb41323396
 const Shippers = () => {
   const router = useRouter();
   const [shippers, setShippers] = useState<ShipperModel[]>([]);

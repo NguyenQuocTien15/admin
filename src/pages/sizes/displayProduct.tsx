@@ -7,7 +7,7 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 import Router from "next/router";
 import { FaEdit } from "react-icons/fa";
 import { DeleteOutlined } from "@ant-design/icons";
@@ -92,7 +92,6 @@ const DisplayProduct = () => {
 
     return () => unsubscribeSizes();
   }, []);
-
 
   // Fetch products and enhance data
   useEffect(() => {
@@ -200,36 +199,35 @@ const DisplayProduct = () => {
       width: 70,
     },
 
-   {
-  title: "Sizes",
-  dataIndex: "variations",
-  key: "variations",
-  render: (variations: any[]) => {
-    return variations?.length > 0 ? (
-      <div>
-        {variations.map((variation, index) => (
-          <div key={index}>
-            <strong>{variation.color}:</strong>
-            {variation.sizes?.length > 0 ? (
-              <ul style={{ margin: 0, paddingLeft: 16 }}>
-                {variation.sizes.map((size: any, idx: number) => (
-                  <li key={idx}>
-                    {sizes[size.size] || size.size} - {size.quantity}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              "No sizes"
-            )}
+    {
+      title: "Sizes",
+      dataIndex: "variations",
+      key: "variations",
+      render: (variations: any[]) => {
+        return variations?.length > 0 ? (
+          <div>
+            {variations.map((variation, index) => (
+              <div key={index}>
+                <strong>{variation.color}:</strong>
+                {variation.sizes?.length > 0 ? (
+                  <ul style={{ margin: 0, paddingLeft: 16 }}>
+                    {variation.sizes.map((size: any, idx: number) => (
+                      <li key={idx}>
+                        {sizes[size.size] || size.size} - {size.quantity}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  "No sizes"
+                )}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    ) : (
-      "No variations"
-    );
-  },
-},
-
+        ) : (
+          "No variations"
+        );
+      },
+    },
 
     {
       title: "I-Price",

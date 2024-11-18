@@ -11,7 +11,7 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 
 const Shipping: React.FC = () => {
   const [orders, setOrders] = useState();

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Form, Input, Select, Button, Card, Image, message } from "antd";
 import { useSearchParams } from "next/navigation";
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 import {
   addDoc,
   collection,

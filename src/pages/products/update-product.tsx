@@ -1,6 +1,6 @@
 import { Form, Input, Select, Button, Card, Image, message } from "antd";
 import { useRouter, useSearchParams } from "next/navigation";
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 import {
   addDoc,
   collection,

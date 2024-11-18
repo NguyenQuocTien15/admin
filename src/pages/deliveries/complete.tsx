@@ -10,7 +10,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 import { Button, Space, Table, Tooltip } from "antd";
 
 const Complete = () => {
@@ -101,50 +101,50 @@ const Complete = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
-   const columns = [
-     { title: "Name", key: "displayName", dataIndex: "displayName" },
-     { title: "Phone", key: "phoneNumber", dataIndex: "phoneNumber" },
-     {
-       title: "Product",
-       key: "items",
-       dataIndex: "items",
-       render: (items: any[]) => items.map((item) => item.title).join(",\n "),
-     },
-     { title: "Address", key: "address", dataIndex: "address" },
-     {
-       title: "Shipper",
-       key: "shipperId",
-       dataIndex: "shipperId",
-       render: (shipperId: any) => shipperId || "Null",
-     },
-     {
-       title: "Payment Method",
-       key: "paymentMethodName",
-       dataIndex: "paymentMethodName",
-     },
-     {
-       title: "Status",
-       key: "orderStatusName",
-       dataIndex: "orderStatusName",
-       render: (text: string) => (
-         <div
-           style={{
-             backgroundColor: "#ff7891",
-             padding: "8px",
-             borderRadius: 10,
-             textAlign: "center",
-           }}
-         >
-           {text}
-         </div>
-       ),
-     },
-     {
-       title: "Date",
-       key: "timestamp",
-       dataIndex: "timestamp",
-     },
-   ];
+  const columns = [
+    { title: "Name", key: "displayName", dataIndex: "displayName" },
+    { title: "Phone", key: "phoneNumber", dataIndex: "phoneNumber" },
+    {
+      title: "Product",
+      key: "items",
+      dataIndex: "items",
+      render: (items: any[]) => items.map((item) => item.title).join(",\n "),
+    },
+    { title: "Address", key: "address", dataIndex: "address" },
+    {
+      title: "Shipper",
+      key: "shipperId",
+      dataIndex: "shipperId",
+      render: (shipperId: any) => shipperId || "Null",
+    },
+    {
+      title: "Payment Method",
+      key: "paymentMethodName",
+      dataIndex: "paymentMethodName",
+    },
+    {
+      title: "Status",
+      key: "orderStatusName",
+      dataIndex: "orderStatusName",
+      render: (text: string) => (
+        <div
+          style={{
+            backgroundColor: "#ff7891",
+            padding: "8px",
+            borderRadius: 10,
+            textAlign: "center",
+          }}
+        >
+          {text}
+        </div>
+      ),
+    },
+    {
+      title: "Date",
+      key: "timestamp",
+      dataIndex: "timestamp",
+    },
+  ];
   return (
     <Layout>
       <div className="mt-3">

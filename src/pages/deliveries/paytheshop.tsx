@@ -1,9 +1,17 @@
-import { HeadComponent } from '@/components';
-import Layout from '@/components/Layout';
-import { fs } from '@/firebase/firabaseConfig';
-import { Button, Space, Table, Tooltip } from 'antd';
-import { collection, doc, getDoc, getDocs, query, updateDoc, where } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react'
+import { HeadComponent } from "@/components";
+import Layout from "@/components/Layout";
+import { fs } from "@/firebase/firebaseConfig";
+import { Button, Space, Table, Tooltip } from "antd";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 
 const PayTheShop = () => {
   const [orders, setOrders] = useState();
@@ -94,7 +102,7 @@ const PayTheShop = () => {
     fetchOrders();
   }, []);
 
-  const handlePayTheShop = async(orderId: string)=>{
+  const handlePayTheShop = async (orderId: string) => {
     try {
       const orderRef = doc(fs, "orders", orderId);
       await updateDoc(orderRef, {
@@ -106,7 +114,7 @@ const PayTheShop = () => {
     } catch (error) {
       console.error("Error updating order status:", error);
     }
-  }
+  };
   const columns = [
     { title: "Name", key: "displayName", dataIndex: "displayName" },
     { title: "Phone", key: "phoneNumber", dataIndex: "phoneNumber" },
@@ -180,6 +188,6 @@ const PayTheShop = () => {
       <Table columns={columns} dataSource={orders}></Table>
     </Layout>
   );
-}
+};
 
-export default PayTheShop
+export default PayTheShop;

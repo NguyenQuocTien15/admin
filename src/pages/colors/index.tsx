@@ -1,7 +1,7 @@
 /** @format */
 
 import { HeadComponent } from "@/components";
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 import AddNewColor from "@/modals/AddNewColor";
 import { ColorModel } from "@/models/ColorModel";
 import { Button, Table } from "antd";
@@ -54,7 +54,10 @@ const Color = () => {
         title="Color"
         pageTitle="Color"
         extra={
-          <Button type="primary" onClick={() => setIsVisibleModalAddColor(true)}>
+          <Button
+            type="primary"
+            onClick={() => setIsVisibleModalAddColor(true)}
+          >
             Add new
           </Button>
         }

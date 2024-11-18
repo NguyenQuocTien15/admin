@@ -1,7 +1,7 @@
 /** @format */
 
 import { HeadComponent } from "@/components";
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 
 import AddNewSize from "@/modals/AddNewSize";
 import { SizeModels } from "@/models/SizeModel";
