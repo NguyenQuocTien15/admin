@@ -64,10 +64,6 @@ const Size = () => {
         visible={isVisibleModalAddSize}
         onClose={() => setIsVisibleModalAddSize(false)}
       />
-      <Button
-        type="primary"
-        onClick={() => router.push("/sizes/add-product")}
-      >Product</Button>
     </div>
   );
 };
