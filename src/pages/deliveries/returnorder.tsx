@@ -10,7 +10,7 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import { fs } from "@/firebase/firabaseConfig";
+import { fs } from "@/firebase/firebaseConfig";
 import { Button, Space, Table, Tooltip } from "antd";
 import { title } from "process";
 
@@ -103,21 +103,19 @@ const ReturnOrders: React.FC = () => {
     fetchOrders();
   }, []);
 
-  const handleReceivedBack = async(orderId : string)=>{
+  const handleReceivedBack = async (orderId: string) => {
     try {
-      const orderRef = doc(fs, 'orders', orderId)
-      await updateDoc(orderRef , {
-        orderStatusId : '10'
-      })
-    alert("Confirm order received back successfully");
+      const orderRef = doc(fs, "orders", orderId);
+      await updateDoc(orderRef, {
+        orderStatusId: "10",
+      });
+      alert("Confirm order received back successfully");
 
-     
-     fetchOrders(); 
-   } catch (error) {
-     console.error("Error updating order status:", error);
-   }
- }; 
-  
+      fetchOrders();
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
 
   const columns = [
     { title: "Name", key: "displayName", dataIndex: "displayName" },
@@ -169,7 +167,13 @@ const ReturnOrders: React.FC = () => {
       render: (id: string) => (
         <Space>
           <Tooltip title="Cancel">
-            <Button className="btn-primary" key={id} onClick={()=> handleReceivedBack(id)}>Nhận hàng</Button>
+            <Button
+              className="btn-primary"
+              key={id}
+              onClick={() => handleReceivedBack(id)}
+            >
+              Nhận hàng
+            </Button>
           </Tooltip>
         </Space>
       ),

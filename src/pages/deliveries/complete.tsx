@@ -1,26 +1,27 @@
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout"; // Adjust path as needed
 import { HeadComponent } from "@/components";
-import { Table } from "antd";
-
 import {
   collection,
   doc,
   getDoc,
   getDocs,
   query,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { fs } from "@/firebase/firebaseConfig";
+import { Button, Space, Table, Tooltip } from "antd";
 
-const Shipping: React.FC = () => {
+const Complete = () => {
   const [orders, setOrders] = useState();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // To manage loading state
+
   const fetchOrders = async () => {
     setLoading(true);
     try {
       const orderRef = collection(fs, "orders");
-      const q = query(orderRef, where("orderStatusId", "==", "5"));
+      const q = query(orderRef, where("orderStatusId", "==", "11"));
       const snapshot = await getDocs(q);
 
       const ordersData = snapshot.docs.map(async (doc) => {
@@ -126,7 +127,16 @@ const Shipping: React.FC = () => {
       key: "orderStatusName",
       dataIndex: "orderStatusName",
       render: (text: string) => (
-        <div style={{ backgroundColor: "#e6f7ff", padding: "8px" }}>{text}</div>
+        <div
+          style={{
+            backgroundColor: "#ff7891",
+            padding: "8px",
+            borderRadius: 10,
+            textAlign: "center",
+          }}
+        >
+          {text}
+        </div>
       ),
     },
     {
@@ -140,7 +150,7 @@ const Shipping: React.FC = () => {
       <div className="mt-3">
         <HeadComponent
           title="Order Management"
-          pageTitle="Đang vận chuyển"
+          pageTitle="Hoàn thành"
         ></HeadComponent>
       </div>
       <Table columns={columns} dataSource={orders}></Table>
@@ -148,4 +158,4 @@ const Shipping: React.FC = () => {
   );
 };
 
-export default Shipping;
+export default Complete;

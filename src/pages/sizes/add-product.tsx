@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Form, Input, Select, Button, Card, Image, message } from "antd";
 import { useSearchParams } from "next/navigation";
-
+import { fs } from "@/firebase/firebaseConfig";
 import {
   addDoc,
   collection,
@@ -11,7 +11,6 @@ import {
 } from "firebase/firestore";
 import ImagePicker from "@/components/ImagePicker"; // Assuming this is a custom component
 import { HandleFile } from "@/utils/handleFile";
-import { fs } from "@/firebase/firebaseConfig";
 
 const AddNewProduct = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -43,7 +42,7 @@ const AddNewProduct = () => {
         form.setFieldsValue(data);
         setImgUrl(data.imageUrl || "");
         setSelectedColors(data.color || []);
-        setColorData(data.colorData || {}); // Make sure the colorData includes sizes and quantities
+        setColorData(data.colorData || {});
       }
     } catch (error) {
       console.error(error);
@@ -85,6 +84,73 @@ const AddNewProduct = () => {
     });
   };
 
+  // const handleAddNewProduct = async (values: any) => {
+  //   setIsLoading(true);
+
+  //   const sizeQuantities = Object.keys(colorData).reduce((acc: any, color) => {
+  //     acc[color] = colorData[color].sizes;
+  //     return acc;
+  //   }, {});
+
+  //   const productData: any = {
+  //     ...values,
+  //     colors: selectedColors,
+  //     sizeQuantities, // Include sizeQuantities in productData
+  //     createdAt: Date.now(),
+  //     updatedAt: Date.now(),
+  //   };
+
+  //   try {
+  //     const uploadedColorImages = await Promise.all(
+  //       selectedColors.map(async (colors) => {
+  //         if (colorData[colors].image) {
+  //           const imageUrl = await HandleFile.uploadSingleFile(
+  //             colorData[colors].image,
+  //             `products/${colors}`
+  //           );
+  //           return { colors, imageUrl };
+  //         }
+  //         return null;
+  //       })
+  //     );
+
+  //     productData.colorImages = uploadedColorImages.reduce((acc, item) => {
+  //       if (item) acc[item.colors] = item.imageUrl;
+  //       return acc;
+  //     }, {});
+
+  //     const productRef = await addDoc(collection(fs, "products"), productData);
+
+  //     if (files.length > 0) {
+  //       await HandleFile.HandleFiles(files, productRef.id, "products");
+  //     }
+
+  //     setIsLoading(false);
+  //     form.resetFields();
+  //     message.success("Product added successfully!");
+  //   } catch (error: any) {
+  //     message.error(`Failed to add product: ${error.message}`);
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  // const handleColorChange = (selectedValues: string[]) => {
+  //   setSelectedColors(selectedValues);
+  //   setColorData((prev: any) => {
+  //     const updatedData = { ...prev };
+  //     selectedValues.forEach((colors) => {
+  //       if (!updatedData[colors]) {
+  //         updatedData[colors] = { sizes: {}, image: null };
+  //       }
+  //     });
+  //     Object.keys(updatedData).forEach((colors) => {
+  //       if (!selectedValues.includes(colors)) {
+  //         delete updatedData[colors];
+  //       }
+  //     });
+  //     return updatedData;
+  //   });
+  // };
   const handleAddNewProduct = async (values: any) => {
     setIsLoading(true);
 
@@ -101,21 +167,21 @@ const AddNewProduct = () => {
             )
           : "";
 
-        const colorSizes = Object.keys(colorData[color]?.sizes || {}).map(
-          (sizeId) => {
-            return {
-              sizeId: parseInt(sizeId, 10), // Convert sizeId to an integer
-
-              quantity: colorData[color]?.sizes[sizeId] || 0,
-            };
-          }
-        );
+       const colorSizes = Object.keys(colorData[color]?.sizes || {}).map(
+         (sizeId) => {
+           return {
+             sizeId: parseInt(sizeId, 10), // Convert sizeId to an integer
+             
+             quantity: colorData[color]?.sizes[sizeId] || 0,
+           };
+         }
+       );
 
         return {
           color,
           image: imageUrl, // Ensure image URL is resolved before saving to Firestore
           sizes: colorSizes,
-          colorCode,
+          colorCode
         };
       })
     );
@@ -137,7 +203,6 @@ const AddNewProduct = () => {
       }
 
       setIsLoading(false);
-      window.history.back()
       form.resetFields();
       message.success("Product added successfully!");
     } catch (error: any) {
@@ -260,6 +325,7 @@ const AddNewProduct = () => {
           />
         </Form.Item>
 
+        
         {selectedColors.map((color) => (
           <div key={color}>
             <h4>{`Settings for color: ${color}`}</h4>

@@ -1,14 +1,5 @@
-/** @format */
-
-import { HeadComponent } from "@/components";
-import AvatarComponent from "@/components/AvatarComponent";
-import BrandComponent from "@/components/BrandComponent";
-import CategoryComponent from "@/components/CategoryComponent";
-import OfferComponent from "@/components/OfferComponent";
-import { fs } from "@/firebase/firebaseConfig";
-import { ProductModel } from "@/models/ProductModel";
-import { Button, message, Modal, Space, Table, Tag, Tooltip, Image } from "antd";
-import { ColumnProps } from "antd/es/table";
+import React, { useEffect, useState } from "react";
+import { Table, message, Image, Space, Tooltip, Button, Modal } from "antd";
 import {
   collection,
   getDocs,
@@ -16,11 +7,11 @@ import {
   deleteDoc,
   doc,
 } from "firebase/firestore";
+import { fs } from "@/firebase/firebaseConfig";
 import Router from "next/router";
 import { FaEdit } from "react-icons/fa";
 import { DeleteOutlined } from "@ant-design/icons";
-import { useEffect, useState } from "react";
-
+import { HeadComponent } from "@/components";
 
 const DisplayProduct = () => {
   const [products, setProducts] = useState<[]>([]);
@@ -245,18 +236,6 @@ const DisplayProduct = () => {
       render: (price: number) => (price ? `$${price}` : "N/A"),
       width: 75,
     },
-   
-    {
-      key: "offer",
-      title: "Offer",
-      dataIndex: "offer",
-      render: (offerId) =>
-        offerId ? (
-          <OfferComponent id={offerId} />
-        ) : (
-          "N/A"
-        ),
-    },
     {
       title: "S-Price",
       dataIndex: "price",
@@ -290,7 +269,7 @@ const DisplayProduct = () => {
             <Button
               type="text"
               icon={<FaEdit color="green" size={20} />}
-              onClick={() => Router.push(`/products/update-product?id=${item.id}`)}
+              onClick={() => Router.push(`/sizes/update-product?id=${item.id}`)}
             />
           </Tooltip>
           <Tooltip title="Delete product">
@@ -314,7 +293,7 @@ const DisplayProduct = () => {
         extra={
           <Button
             type="primary"
-            onClick={() => Router.push("/products/add-new-product")}
+            onClick={() => Router.push("/sizes/add-product")}
           >
             Add product
           </Button>

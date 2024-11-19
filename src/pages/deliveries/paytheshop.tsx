@@ -1,26 +1,27 @@
-import React, { useEffect, useState } from "react";
-import Layout from "../../components/Layout"; // Adjust path as needed
 import { HeadComponent } from "@/components";
-import { Table } from "antd";
-
+import Layout from "@/components/Layout";
+import { fs } from "@/firebase/firebaseConfig";
+import { Button, Space, Table, Tooltip } from "antd";
 import {
   collection,
   doc,
   getDoc,
   getDocs,
   query,
+  updateDoc,
   where,
 } from "firebase/firestore";
-import { fs } from "@/firebase/firebaseConfig";
+import React, { useEffect, useState } from "react";
 
-const Shipping: React.FC = () => {
+const PayTheShop = () => {
   const [orders, setOrders] = useState();
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // To manage loading state
+
   const fetchOrders = async () => {
     setLoading(true);
     try {
       const orderRef = collection(fs, "orders");
-      const q = query(orderRef, where("orderStatusId", "==", "5"));
+      const q = query(orderRef, where("orderStatusId", "==", "9"));
       const snapshot = await getDocs(q);
 
       const ordersData = snapshot.docs.map(async (doc) => {
@@ -100,6 +101,20 @@ const Shipping: React.FC = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  const handlePayTheShop = async (orderId: string) => {
+    try {
+      const orderRef = doc(fs, "orders", orderId);
+      await updateDoc(orderRef, {
+        orderStatusId: "11",
+      });
+      alert("Confirm pay the order successfully");
+
+      fetchOrders();
+    } catch (error) {
+      console.error("Error updating order status:", error);
+    }
+  };
   const columns = [
     { title: "Name", key: "displayName", dataIndex: "displayName" },
     { title: "Phone", key: "phoneNumber", dataIndex: "phoneNumber" },
@@ -126,7 +141,16 @@ const Shipping: React.FC = () => {
       key: "orderStatusName",
       dataIndex: "orderStatusName",
       render: (text: string) => (
-        <div style={{ backgroundColor: "#e6f7ff", padding: "8px" }}>{text}</div>
+        <div
+          style={{
+            backgroundColor: "#ff7891",
+            padding: "8px",
+            borderRadius: 10,
+            textAlign: "center",
+          }}
+        >
+          {text}
+        </div>
       ),
     },
     {
@@ -134,13 +158,31 @@ const Shipping: React.FC = () => {
       key: "timestamp",
       dataIndex: "timestamp",
     },
+    {
+      title: "Action",
+      dataIndex: "id",
+
+      render: (id: string) => (
+        <Space>
+          <Tooltip title="Cancel">
+            <Button
+              className="btn-primary"
+              key={id}
+              onClick={() => handlePayTheShop(id)}
+            >
+              Nhận tiền
+            </Button>
+          </Tooltip>
+        </Space>
+      ),
+    },
   ];
   return (
     <Layout>
       <div className="mt-3">
         <HeadComponent
           title="Order Management"
-          pageTitle="Đang vận chuyển"
+          pageTitle="Trả tiền"
         ></HeadComponent>
       </div>
       <Table columns={columns} dataSource={orders}></Table>
@@ -148,4 +190,4 @@ const Shipping: React.FC = () => {
   );
 };
 
-export default Shipping;
+export default PayTheShop;
