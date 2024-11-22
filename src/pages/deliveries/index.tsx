@@ -141,7 +141,15 @@ const NewOrders = ({}) => {
       title: "Product",
       key: "items",
       dataIndex: "items",
-      render: (items: any[]) => items.map((item) => item.productId).join(", "),
+      
+      render: (items: any[]) =>
+        items.map((item) => (
+          <p>
+            {item.productId}
+            <br></br> {item.color} - {item.size} - {item.quantity}
+            <br></br>
+          </p>
+        )),
     },
     { title: "Address", key: "address", dataIndex: "address" },
     {
@@ -171,21 +179,21 @@ const NewOrders = ({}) => {
     {
       title: "Action",
       dataIndex: "id",
-      
+
       render: (id: string) => (
         <Space>
           <Tooltip title="Cancel">
             <Button
               key={id}
               icon={<BiTrash size={25} style={{ color: "red" }} />}
-              onClick={() => handleDeleteOrder(id)} 
+              onClick={() => handleDeleteOrder(id)}
             ></Button>
           </Tooltip>
           <Tooltip title="Confirm">
             <Button
               key={id}
               icon={<FaCheck size={25} style={{ color: "green" }} />}
-              onClick={() => handleConfirmNewOrder(id)} 
+              onClick={() => handleConfirmNewOrder(id)}
             ></Button>
           </Tooltip>
         </Space>

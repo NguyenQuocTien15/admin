@@ -101,7 +101,15 @@ const Package: React.FC = () => {
       title: "Product",
       key: "items",
       dataIndex: "items",
-      render: (items: any[]) => items.map((item) => item.title).join(",\n "),
+
+      render: (items: any[]) =>
+        items.map((item) => (
+          <p>
+            {item.productId}
+            <br></br> {item.color} - {item.size} - {item.quantity}
+            <br></br>
+          </p>
+        )),
     },
     { title: "Address", key: "address", dataIndex: "address" },
     {
