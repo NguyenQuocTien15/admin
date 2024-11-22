@@ -11,7 +11,7 @@ import { FaPercentage } from 'react-icons/fa';
 import { IoMdPricetag } from 'react-icons/io';
 import { AiOutlineBarChart } from 'react-icons/ai';
 import { SkinOutlined, UserAddOutlined } from '@ant-design/icons';
-import { SiZenn } from 'react-icons/si';
+import { SiCashapp, SiZenn } from 'react-icons/si';
 import { GiClothes } from 'react-icons/gi';
 import { IoColorPalette } from 'react-icons/io5';
 
@@ -30,6 +30,11 @@ const SiderComponent = () => {
       key: "delivery",
       label: <Link href={"/deliveries"}>Delivery</Link>,
       icon: <FaShoppingCart />,
+    },
+    {
+      key: "cashier",
+      label: <Link href={"/cashier"}>Cashier</Link>,
+      icon: <SiCashapp />,
     },
     {
       key: "users",
