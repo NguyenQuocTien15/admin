@@ -1,7 +1,6 @@
+import React, { useEffect, useState } from "react";
+import Layout from "../../components/Layout"; // Adjust path as needed
 import { HeadComponent } from "@/components";
-import Layout from "@/components/Layout";
-import { fs } from "@/firebase/firebaseConfig";
-import { Button, Space, Table, Tooltip } from "antd";
 import {
   collection,
   doc,
@@ -11,10 +10,10 @@ import {
   updateDoc,
   where,
 } from "firebase/firestore";
-import Router from "next/router";
-import React, { useEffect, useState } from "react";
+import { fs } from "@/firebase/firebaseConfig";
+import { Button, Space, Table, Tooltip } from "antd";
 
-const PayTheShop = () => {
+const Complete = () => {
   const [orders, setOrders] = useState();
   const [loading, setLoading] = useState(true); // To manage loading state
 
@@ -22,7 +21,7 @@ const PayTheShop = () => {
     setLoading(true);
     try {
       const orderRef = collection(fs, "orders");
-      const q = query(orderRef, where("orderStatusId", "==", "9"));
+      const q = query(orderRef, where("orderStatusId", "==", "11"));
       const snapshot = await getDocs(q);
 
       const ordersData = snapshot.docs.map(async (doc) => {
@@ -102,20 +101,6 @@ const PayTheShop = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
-
-  const handlePayTheShop = async (orderId: string) => {
-    try {
-      const orderRef = doc(fs, "orders", orderId);
-      await updateDoc(orderRef, {
-        orderStatusId: "11",
-      });
-      alert("Confirm pay the order successfully");
-
-      fetchOrders();
-    } catch (error) {
-      console.error("Error updating order status:", error);
-    }
-  };
   const columns = [
     { title: "Name", key: "displayName", dataIndex: "displayName" },
     { title: "Phone", key: "phoneNumber", dataIndex: "phoneNumber" },
@@ -167,42 +152,18 @@ const PayTheShop = () => {
       key: "timestamp",
       dataIndex: "timestamp",
     },
-    {
-      title: "Action",
-      dataIndex: "id",
-
-      render: (id: string) => (
-        <Space>
-          <Tooltip title="Cancel">
-            <Button
-              className="btn-primary"
-              key={id}
-              onClick={() => handlePayTheShop(id)}
-            >
-              Nhận tiền
-            </Button>
-          </Tooltip>
-        </Space>
-      ),
-    },
   ];
   return (
-    <div className="mt-3">
-      <HeadComponent
-        title="Order Management"
-        pageTitle="Trả tiền"
-        extra={
-          <Button
-            type="primary"
-            onClick={() => Router.push('./cashier/complete')}
-          >
-            Đã nhận tiền
-          </Button>
-        }
-      ></HeadComponent>
-      <Table columns={columns} dataSource={orders}></Table>
-    </div>
+    
+      <div className="mt-3">
+        <HeadComponent
+          title="Order Management"
+          pageTitle="Hoàn thành"
+        ></HeadComponent> <Table columns={columns} dataSource={orders}></Table>
+      </div>
+     
+    
   );
 };
 
-export default PayTheShop;
+export default Complete;
