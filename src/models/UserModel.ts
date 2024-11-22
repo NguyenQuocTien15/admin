@@ -6,4 +6,5 @@ export interface UserModel {
   photoUrl: any;
   displayName: string;
   emailVerified: boolean;
+
 }
