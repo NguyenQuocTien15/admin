@@ -260,54 +260,56 @@ const AddNewProduct = () => {
           />
         </Form.Item>
 
-        {selectedColors.map((color) => (
-          <div key={color}>
-            <h4>{`Settings for color: ${color}`}</h4>
-            <Form.Item label="Select Sizes">
-              <Select
-                mode="multiple"
-                value={Object.keys(colorData[color]?.sizes || {})}
-                onChange={(sizes) => handleSizeChangeForColor(color, sizes)}
-                options={sizes}
-              />
-            </Form.Item>
+        {selectedColors.map((color) => {
+          const colorName = colors.find((c) => c.value === color)?.label;
+           return (
+             <div key={color}>
+               <h4>{`Settings for color: ${colorName}`}</h4>
+               <Form.Item label="Select Sizes">
+                 <Select
+                   mode="multiple"
+                   value={Object.keys(colorData[color]?.sizes || {})}
+                   onChange={(sizes) => handleSizeChangeForColor(color, sizes)}
+                   options={sizes}
+                 />
+               </Form.Item>
 
-            {Object.keys(colorData[color]?.sizes || {}).map((sizeId) => (
-              <Form.Item
-                key={sizeId}
-                label={`Quantity for size ${
-                  sizes.find((size) => size.value === sizeId)?.label
-                }`}
-              >
-                <Input
-                  type="number"
-                  value={colorData[color].sizes[sizeId]}
-                  onChange={(e) =>
-                    handleQuantityChange(
-                      color,
-                      sizeId,
-                      parseInt(e.target.value)
-                    )
-                  }
-                />
-              </Form.Item>
-            ))}
+               {Object.keys(colorData[color]?.sizes || {}).map((sizeId) => (
+                 <Form.Item
+                   key={sizeId}
+                   label={`Quantity for size ${
+                     sizes.find((size) => size.value === sizeId)?.label
+                   }`}
+                 >
+                   <Input
+                     type="number"
+                     value={colorData[color].sizes[sizeId]}
+                     onChange={(e) =>
+                       handleQuantityChange(
+                         color,
+                         sizeId,
+                         parseInt(e.target.value)
+                       )
+                     }
+                   />
+                 </Form.Item>
+               ))}
 
-            <Form.Item label={`Image for color ${color}`}>
-              <ImagePicker
-                onSelected={(files) =>
-                  handleImageUploadForColor(color, files[0])
-                }
-              />
-              {colorData[color]?.image && (
-                <Image
-                  src={URL.createObjectURL(colorData[color].image)}
-                  width={100}
-                />
-              )}
-            </Form.Item>
-          </div>
-        ))}
+               <Form.Item label={`Image for color ${colorName}`}>
+                 <ImagePicker
+                   onSelected={(files) =>
+                     handleImageUploadForColor(color, files[0])
+                   }
+                 />
+                 {colorData[color]?.image && (
+                   <Image
+                     src={URL.createObjectURL(colorData[color].image)}
+                     width={100}
+                   />
+                 )}
+               </Form.Item>
+             </div>
+           );})}
 
         <Form.Item label="Product Image">
           <ImagePicker
