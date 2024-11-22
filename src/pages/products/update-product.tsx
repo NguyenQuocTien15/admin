@@ -27,6 +27,7 @@ const UpdateProduct = () => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const router = useRouter();
+  const [offer, setOffer] = useState<any[]>([]);
 
   useEffect(() => {
     if (id) {
@@ -36,6 +37,7 @@ const UpdateProduct = () => {
     getSizes();
     getBrands();
     getColors();
+    getOffers()
   }, [id]);
 
   const getProductDetail = async (id: string) => {
@@ -99,6 +101,13 @@ const UpdateProduct = () => {
           label: doc.data().colorName,
           colorCode: doc.data().colorCode, // Assuming there's a colorCode field
         }))
+      );
+    });
+  };
+  const getOffers = () => {
+    onSnapshot(collection(fs, "offers"), (snap) => {
+      setOffer(
+        snap.docs.map((doc) => ({ value: doc.id, label: doc.data().title }))
       );
     });
   };
@@ -252,6 +261,9 @@ const handleUpdateProduct = async (values: any) => {
 
         <Form.Item name="brand" label="Brand">
           <Select options={brand} />
+        </Form.Item>
+        <Form.Item name="offer" label="Offer">
+          <Select options={offer} />
         </Form.Item>
         <Form.Item name={"description"} label="Description">
           <Input.TextArea rows={3} />

@@ -7,7 +7,16 @@ import CategoryComponent from "@/components/CategoryComponent";
 import OfferComponent from "@/components/OfferComponent";
 import { fs } from "@/firebase/firebaseConfig";
 import { ProductModel } from "@/models/ProductModel";
-import { Button, message, Modal, Space, Table, Tag, Tooltip, Image } from "antd";
+import {
+  Button,
+  message,
+  Modal,
+  Space,
+  Table,
+  Tag,
+  Tooltip,
+  Image,
+} from "antd";
 import { ColumnProps } from "antd/es/table";
 import {
   collection,
@@ -20,7 +29,7 @@ import Router from "next/router";
 import { FaEdit } from "react-icons/fa";
 import { DeleteOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-
+import Offers from "../offers";
 
 const DisplayProduct = () => {
   const [products, setProducts] = useState<[]>([]);
@@ -28,6 +37,7 @@ const DisplayProduct = () => {
   const [colors, setColors] = useState<{ [key: string]: string }>({});
   const [sizes, setSizes] = useState<{ [key: string]: string }>({});
   const [brands, setBrands] = useState<{ [key: string]: string }>({});
+  const [offers, setOffers] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(true);
 
   // Fetch categories, colors, and sizes
@@ -54,13 +64,6 @@ const DisplayProduct = () => {
       }
     );
 
-    // const unsubscribeSizes = onSnapshot(collection(fs, "sizes"), (snapshot) => {
-    //   const sizeMap: { [key: string]: string } = {};
-    //   snapshot.docs.forEach((doc) => {
-    //     sizeMap[doc.id] = doc.data().sizeName;
-    //   });
-    //   setSizes(sizeMap);
-    // });
     const unsubscribeSizes = onSnapshot(collection(fs, "sizes"), (snapshot) => {
       const sizeMap: { [key: string]: string } = {};
       snapshot.docs.forEach((doc) => {
@@ -86,9 +89,20 @@ const DisplayProduct = () => {
     });
     setBrands(brandMapping);
   };
+   const fetchOffers= async () => {
+     const offerSnapshot = await getDocs(collection(fs, "offers"));
+     const offerMapping: { [key: string]: string } = {};
+     offerSnapshot.forEach((doc) => {
+       const data = doc.data();
+       offerMapping[doc.id] = data.title; // Assuming the offer name is in the `title` field
+     });
+     setOffers(offerMapping);
+   };
+
 
   useEffect(() => {
     fetchBrands();
+    fetchOffers()
   }, []);
   useEffect(() => {
     const unsubscribeSizes = onSnapshot(collection(fs, "sizes"), (snapshot) => {
@@ -116,6 +130,7 @@ const DisplayProduct = () => {
               (id: string) => categories[id] || id
             ),
             brand: data.brand,
+            offer: data.offer,
             colors: data.colors?.map((id: string) => colors[id] || id),
             variations:
               data.variations?.map((variation: any) => ({
@@ -141,7 +156,7 @@ const DisplayProduct = () => {
     );
 
     return () => unsubscribe();
-  }, [categories, colors, sizes]);
+  }, [categories, colors, sizes, offers]);
 
   // Handle delete product
   const handleDelete = (productId: string) => {
@@ -160,7 +175,6 @@ const DisplayProduct = () => {
       },
     });
   };
-  const sizeData = Array.isArray(sizes) ? sizes : []; // Đảm bảo sizes là mảng
 
   // Define table columns
   const columns = [
@@ -245,17 +259,12 @@ const DisplayProduct = () => {
       render: (price: number) => (price ? `$${price}` : "N/A"),
       width: 75,
     },
-   
+
     {
       key: "offer",
       title: "Offer",
       dataIndex: "offer",
-      render: (offerId) =>
-        offerId ? (
-          <OfferComponent id={offerId} />
-        ) : (
-          "N/A"
-        ),
+      render: (offerId: string) => offers[offerId] || "Unknown",
     },
     {
       title: "S-Price",
@@ -290,7 +299,9 @@ const DisplayProduct = () => {
             <Button
               type="text"
               icon={<FaEdit color="green" size={20} />}
-              onClick={() => Router.push(`/products/update-product?id=${item.id}`)}
+              onClick={() =>
+                Router.push(`/products/update-product?id=${item.id}`)
+              }
             />
           </Tooltip>
           <Tooltip title="Delete product">

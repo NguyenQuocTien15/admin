@@ -19,6 +19,7 @@ const AddNewProduct = () => {
   const [imgUrl, setImgUrl] = useState("");
   const [categories, setCategories] = useState<any[]>([]);
   const [brand, setBrand] = useState<any[]>([]);
+   const [offer, setOffer] = useState<any[]>([]);
   const [sizes, setSizes] = useState<any[]>([]);
   const [colors, setColors] = useState<any[]>([]);
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
@@ -33,6 +34,7 @@ const AddNewProduct = () => {
     getSizes();
     getBrands();
     getColors();
+    getOffers();
   }, [id]);
 
   const getProductDetail = async (id: string) => {
@@ -61,6 +63,13 @@ const AddNewProduct = () => {
   const getBrands = () => {
     onSnapshot(collection(fs, "brands"), (snap) => {
       setBrand(
+        snap.docs.map((doc) => ({ value: doc.id, label: doc.data().title }))
+      );
+    });
+  };
+  const getOffers = () => {
+    onSnapshot(collection(fs, "offers"), (snap) => {
+      setOffer(
         snap.docs.map((doc) => ({ value: doc.id, label: doc.data().title }))
       );
     });
@@ -227,6 +236,9 @@ const AddNewProduct = () => {
         <Form.Item name="brand" label="Brand">
           <Select options={brand} />
         </Form.Item>
+        <Form.Item name="offer" label="Offer">
+          <Select options={offer} />
+        </Form.Item>
         <Form.Item name={"description"} label="Description">
           <Input.TextArea rows={3} />
         </Form.Item>
@@ -262,54 +274,55 @@ const AddNewProduct = () => {
 
         {selectedColors.map((color) => {
           const colorName = colors.find((c) => c.value === color)?.label;
-           return (
-             <div key={color}>
-               <h4>{`Settings for color: ${colorName}`}</h4>
-               <Form.Item label="Select Sizes">
-                 <Select
-                   mode="multiple"
-                   value={Object.keys(colorData[color]?.sizes || {})}
-                   onChange={(sizes) => handleSizeChangeForColor(color, sizes)}
-                   options={sizes}
-                 />
-               </Form.Item>
+          return (
+            <div key={color}>
+              <h4>{`Settings for color: ${colorName}`}</h4>
+              <Form.Item label="Select Sizes">
+                <Select
+                  mode="multiple"
+                  value={Object.keys(colorData[color]?.sizes || {})}
+                  onChange={(sizes) => handleSizeChangeForColor(color, sizes)}
+                  options={sizes}
+                />
+              </Form.Item>
 
-               {Object.keys(colorData[color]?.sizes || {}).map((sizeId) => (
-                 <Form.Item
-                   key={sizeId}
-                   label={`Quantity for size ${
-                     sizes.find((size) => size.value === sizeId)?.label
-                   }`}
-                 >
-                   <Input
-                     type="number"
-                     value={colorData[color].sizes[sizeId]}
-                     onChange={(e) =>
-                       handleQuantityChange(
-                         color,
-                         sizeId,
-                         parseInt(e.target.value)
-                       )
-                     }
-                   />
-                 </Form.Item>
-               ))}
+              {Object.keys(colorData[color]?.sizes || {}).map((sizeId) => (
+                <Form.Item
+                  key={sizeId}
+                  label={`Quantity for size ${
+                    sizes.find((size) => size.value === sizeId)?.label
+                  }`}
+                >
+                  <Input
+                    type="number"
+                    value={colorData[color].sizes[sizeId]}
+                    onChange={(e) =>
+                      handleQuantityChange(
+                        color,
+                        sizeId,
+                        parseInt(e.target.value)
+                      )
+                    }
+                  />
+                </Form.Item>
+              ))}
 
-               <Form.Item label={`Image for color ${colorName}`}>
-                 <ImagePicker
-                   onSelected={(files) =>
-                     handleImageUploadForColor(color, files[0])
-                   }
-                 />
-                 {colorData[color]?.image && (
-                   <Image
-                     src={URL.createObjectURL(colorData[color].image)}
-                     width={100}
-                   />
-                 )}
-               </Form.Item>
-             </div>
-           );})}
+              <Form.Item label={`Image for color ${colorName}`}>
+                <ImagePicker
+                  onSelected={(files) =>
+                    handleImageUploadForColor(color, files[0])
+                  }
+                />
+                {colorData[color]?.image && (
+                  <Image
+                    src={URL.createObjectURL(colorData[color].image)}
+                    width={100}
+                  />
+                )}
+              </Form.Item>
+            </div>
+          );
+        })}
 
         <Form.Item label="Product Image">
           <ImagePicker
