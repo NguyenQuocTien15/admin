@@ -106,16 +106,71 @@ const ReturnOrders: React.FC = () => {
   const handleReceivedBack = async (orderId: string) => {
     try {
       const orderRef = doc(fs, "orders", orderId);
-      await updateDoc(orderRef, {
-        orderStatusId: "10",
-      });
-      alert("Confirm order received back successfully");
 
-      fetchOrders();
+      // Lấy thông tin chi tiết của đơn hàng
+      const orderSnap = await getDoc(orderRef);
+      if (!orderSnap.exists()) {
+        alert("Order not found.");
+        return;
+      }
+
+      const orderData = orderSnap.data();
+
+      // Kiểm tra danh sách sản phẩm trong đơn hàng
+      if (!orderData.items || orderData.items.length === 0) {
+        alert("No items found in the order.");
+        return;
+      }
+
+      // Cập nhật số lượng sản phẩm trong bảng `products`
+      for (const item of orderData.items) {
+        const productRef = doc(fs, "products", item.productId);
+        const productSnap = await getDoc(productRef);
+
+        if (!productSnap.exists()) {
+          console.warn(`Product ${item.productId} not found.`);
+          continue;
+        }
+
+        const productData = productSnap.data();
+
+        // Cập nhật số lượng theo size và color
+        const updatedVariations = productData.variations.map(
+          (variation: any) => {
+            if (variation.color === item.colorSelected) {
+              return {
+                ...variation,
+                sizes: variation.sizes.map((size: any) => {
+                  if (size.sizeId === item.sizeSelected) {
+                    return {
+                      ...size,
+                      quantity: size.quantity + item.quantity, // Tăng số lượng
+                    };
+                  }
+                  return size;
+                }),
+              };
+            }
+            return variation;
+          }
+        );
+
+        // Cập nhật lại sản phẩm trong Firestore
+        await updateDoc(productRef, { variations: updatedVariations });
+      }
+
+      // Cập nhật trạng thái đơn hàng
+      await updateDoc(orderRef, {
+        orderStatusId: "10", // Đã nhận về
+      });
+
+      alert("Confirm order received back successfully");
+      fetchOrders(); // Refresh danh sách đơn hàng
     } catch (error) {
       console.error("Error updating order status:", error);
     }
   };
+
 
   const columns = [
     { title: "Name", key: "displayName", dataIndex: "displayName" },
@@ -128,7 +183,7 @@ const ReturnOrders: React.FC = () => {
       render: (items: any[]) =>
         items.map((item) => (
           <p>
-            {item.productId}
+            {item.title}
             <br></br> {item.color} - {item.size} - {item.quantity}
             <br></br>
           </p>
@@ -167,16 +222,17 @@ const ReturnOrders: React.FC = () => {
       title: "Date",
       key: "timestamp",
       dataIndex: "timestamp",
+      width:50
     },
     {
       title: "Action",
       dataIndex: "id",
-
+      width :50,
       render: (id: string) => (
         <Space>
           <Tooltip title="Cancel">
             <Button
-              className="btn-primary"
+              style={{ backgroundColor: "yellow" }}
               key={id}
               onClick={() => handleReceivedBack(id)}
             >

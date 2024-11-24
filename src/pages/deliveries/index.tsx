@@ -2,7 +2,7 @@ import { HeadComponent } from "@/components";
 import Layout from "@/components/Layout";
 import { fs } from "@/firebase/firebaseConfig";
 
-import { Button, Space, Table, Tooltip } from "antd";
+import { Button, message, Modal, Space, Table, Tooltip } from "antd";
 import {
   collection,
   deleteDoc,
@@ -132,13 +132,29 @@ const NewOrders = ({}) => {
 
 //ham xu li xac huy don hang
  const handleDeleteOrder = async( orderId: string)=>{
-  try {
-    const orderRef = doc(fs, 'orders', orderId)
-    await deleteDoc(orderRef)
-    fetchOrders();
-  } catch (error) {
-    console.error("Error delete order status:", error);
-  }
+   Modal.confirm({
+     title: "Are you sure you want to cancel this order?",
+     content: "This action cannot be undone.",
+     okText: "Yes, cancel",
+     cancelText: "No",
+     onOk: async () => {
+       try {
+        const orderRef = doc(fs, "orders", orderId);
+        await deleteDoc(orderRef);
+        fetchOrders();
+         message.success("Product deleted successfully");
+       } catch (error: any) {
+         console.error("Error delete order status:", error);
+       }
+     },
+   });
+  // try {
+  //   const orderRef = doc(fs, 'orders', orderId)
+  //   await deleteDoc(orderRef)
+  //   fetchOrders();
+  // } catch (error) {
+  //   console.error("Error delete order status:", error);
+  // }
  }
 //ham xu li huy don hang
 
