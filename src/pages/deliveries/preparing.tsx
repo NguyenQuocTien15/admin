@@ -2,15 +2,26 @@ import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout"; // Adjust path as needed
 import { HeadComponent } from "@/components";
 import { Button, Table, Tooltip } from "antd";
-import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 import { useRouter } from "next/router";
 import { fs } from "@/firebase/firebaseConfig";
 
 const Preparing: React.FC = () => {
   const router = useRouter();
-  const [orders, setOrders] = useState();
-  const [loading, setLoading] = useState(true); // To manage loading state
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true); // Manage loading state
 
+  // Fetch orders from Firestore
   const fetchOrders = async () => {
     setLoading(true);
     try {
@@ -28,6 +39,7 @@ const Preparing: React.FC = () => {
 
         return {
           id: doc.id,
+          userId: order.userId,
           ...order,
           orderStatusName,
           paymentMethodName,
@@ -35,7 +47,6 @@ const Preparing: React.FC = () => {
           phoneNumber,
         };
       });
-
       setOrders(await Promise.all(ordersData));
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -44,6 +55,7 @@ const Preparing: React.FC = () => {
     }
   };
 
+  // Fetch order status name
   const getOrderStatusName = async (orderStatusId: string) => {
     if (!orderStatusId) return "Unknown";
 
@@ -59,6 +71,8 @@ const Preparing: React.FC = () => {
       return "Unknown";
     }
   };
+
+  // Fetch payment method name
   const getPaymentMethodName = async (id: string) => {
     if (!id) return "Unknown";
 
@@ -68,44 +82,115 @@ const Preparing: React.FC = () => {
         ? paymentMethodDoc.data().paymentMethodName
         : "Unknown";
     } catch (error) {
-      console.error("Error fetching order status:", error);
+      console.error("Error fetching payment method:", error);
       return "Unknown";
     }
-  }; 
-const getUserOrder = async (id: string) => {
-  if (!id) return { displayName: "Unknown", phoneNumber: "Unknown" };
+  };
 
-  try {
-    const userDoc = await getDoc(doc(fs, "users", id));
+  // Fetch user details for the order
+  const getUserOrder = async (id: string) => {
+    if (!id) return { displayName: "Unknown", phoneNumber: "Unknown" };
 
-    if (userDoc.exists()) {
-      const userData = userDoc.data();
-      return {
-        displayName: userData.displayName || "Unknown",
-        phoneNumber: userData.phoneNumber || "Unknown",
-      };
-    } else {
+    try {
+      const userDoc = await getDoc(doc(fs, "users", id));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        return {
+          displayName: userData.displayName || "Unknown",
+          phoneNumber: userData.phoneNumber || "Unknown",
+        };
+      }
+      return { displayName: "Unknown", phoneNumber: "Unknown" };
+    } catch (error) {
+      console.error("Error fetching user data:", error);
       return { displayName: "Unknown", phoneNumber: "Unknown" };
     }
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    return { displayName: "Unknown", phoneNumber: "Unknown" };
-  }
-};
+  };
+
   useEffect(() => {
     fetchOrders();
   }, []);
-  const handlePackageOrder = async (orderId: string) => {
+
+  // Add notification to Firestore
+  const addNotification = async (
+    userId: string,
+    orderId: string,
+    status: string
+  ) => {
+    try {
+      await addDoc(collection(fs, "notifications"), {
+        userId,
+        orderId,
+        title: "Trạng thái đơn hàng",
+        body: `Đơn hàng của bạn (#${orderId}) đã chuyển sang trạng thái: ${status}`,
+        status,
+        createdAt: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error("Error adding notification:", error);
+    }
+  };
+
+  // Send FCM notification
+  const sendNotification = async (
+    userId: string,
+    orderId: string,
+    status: string
+  ) => {
+    try {
+      const userDoc = await getDoc(doc(fs, "users", userId));
+      if (!userDoc.exists()) {
+        console.error("User not found");
+        return;
+      }
+
+      const userData = userDoc.data();
+      const fcmToken = userData?.fcmToken;
+
+      if (!fcmToken) {
+        console.error("FCM token not found for user:", userId);
+        return;
+      }
+
+      console.log(`Notification prepared for user ${userId} with token ${fcmToken}`);
+      // Add your FCM notification sending logic here.
+    } catch (error) {
+      console.error("Error sending notification:", error);
+    }
+  };
+
+  // Update order to "preparing" status
+  const handlePreparingOrder = async (orderId: string) => {
     try {
       const orderRef = doc(fs, "orders", orderId);
       await updateDoc(orderRef, {
         orderStatusId: "3",
       });
-      alert("Package order successfully");
-
       fetchOrders();
+      alert("Đơn hàng đã được chuyển sang trạng thái 'Đã đóng gói'!");
     } catch (error) {
       console.error("Error updating order status:", error);
+      alert("Có lỗi xảy ra khi cập nhật trạng thái đơn hàng!");
+    }
+  };
+
+  // Handle preparing order and sending notifications
+  const handlePreparingOrderWithNotification = async (
+    orderId: string,
+    userId: string
+  ) => {
+    if (!orderId || !userId) {
+      console.error("Missing orderId or userId");
+      alert("Thông tin đơn hàng không đầy đủ!");
+      return;
+    }
+
+    try {
+      await handlePreparingOrder(orderId);
+      await addNotification(userId, orderId, "Đã đóng gói và chờ vận chuyển");
+      await sendNotification(userId, orderId, "Đã đóng gói và chờ vận chuyển");
+    } catch (error) {
+      console.error("Error handling order and notification:", error);
     }
   };
 
@@ -116,23 +201,15 @@ const getUserOrder = async (id: string) => {
       title: "Product",
       key: "items",
       dataIndex: "items",
-
       render: (items: any[]) =>
         items.map((item) => (
-          <p>
+          <p key={item.productId}>
             {item.productId}
-            <br></br> {item.color} - {item.size} - {item.quantity}
-            <br></br>
+            <br /> {item.color} - {item.size} - {item.quantity}
           </p>
         )),
     },
     { title: "Address", key: "address", dataIndex: "address" },
-    {
-      title: "Shipper",
-      key: "shipperId",
-      dataIndex: "shipperId",
-      render: (shipperId: any) => shipperId || "Null",
-    },
     {
       title: "Payment Method",
       key: "paymentMethodName",
@@ -147,20 +224,17 @@ const getUserOrder = async (id: string) => {
       ),
     },
     {
-      title: "Date",
-      key: "timestamp",
-      dataIndex: "timestamp",
-    },
-    {
       title: "Action",
       dataIndex: "id",
-
-      render: (id: string) => (
-        <Tooltip title="Preparing">
+      render: (_: any, record: any) => (
+        <Tooltip title="Đóng gói">
           <Button
             className="btn-primary"
-            key={id}
-            onClick={() => handlePackageOrder(id)}
+            onClick={() =>
+              record.id && record.userId
+                ? handlePreparingOrderWithNotification(record.id, record.userId)
+                : console.error("Missing order id or user id")
+            }
           >
             Đóng gói
           </Button>
@@ -172,12 +246,9 @@ const getUserOrder = async (id: string) => {
   return (
     <Layout>
       <div className="mt-3">
-        <HeadComponent
-          title="Order Management"
-          pageTitle="Đang chuẩn bị"
-        ></HeadComponent>
+        <HeadComponent title="Order Management" pageTitle="Đang chuẩn bị" />
       </div>
-      <Table columns={columns} dataSource={orders}></Table>
+      <Table columns={columns} dataSource={orders} loading={loading} />
     </Layout>
   );
 };

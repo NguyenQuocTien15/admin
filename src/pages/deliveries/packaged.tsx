@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Layout from "../../components/Layout"; // Adjust path as needed
 import { HeadComponent } from "@/components";
 import { Button, Table, Tooltip } from "antd";
-import { collection, doc, getDoc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, updateDoc, where, addDoc ,serverTimestamp} from "firebase/firestore";
 import { fs } from "@/firebase/firebaseConfig";
 
 const Package: React.FC = () => {
@@ -33,7 +33,7 @@ const Package: React.FC = () => {
           phoneNumber,
         };
       });
-
+//@ts-ignore
       setOrders(await Promise.all(ordersData));
     } catch (error) {
       console.error("Error fetching orders:", error);
@@ -93,6 +93,70 @@ const Package: React.FC = () => {
   useEffect(() => {
     fetchOrders();
   }, []);
+//them thong bao don hang dang chuan bi vao bang notifications
+const addNotification = async (
+  userId: string,
+  orderId: string,
+  status: string
+) => {
+  try {
+    await addDoc(collection(fs, "notifications"), {
+      userId,
+      orderId,
+      title: "Trạng thái đơn hàng",
+      body: `Đơn hàng của bạn (#${orderId}) đã chuyển sang trạng thái: ${status}`,
+      status,
+      createdAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error("Error adding notification:", error);
+  }
+};
+//thong bao don hang dang chuan bi
+
+//gui thong bao vao app khach hang  // Hàm gửi thông báo FCM
+const sendNotification = async (
+  userId: string,
+  orderId: string,
+  status: string
+) => {
+  try {
+    const userDoc = await getDoc(doc(fs, "users", userId));
+    if (!userDoc.exists()) {
+      console.error("User not found");
+      return;
+    }
+
+    const userData = userDoc.data();
+    const fcmToken = userData?.fcmToken; // Đảm bảo token được lưu khi user đăng nhập
+
+    if (!fcmToken) {
+      console.error("FCM token not found for user:", userId);
+      return;
+    }
+
+    // Tạo payload thông báo
+    const message = {
+      token: fcmToken,
+      notification: {
+        title: "Trạng thái đơn hàng",
+        body: `Đơn hàng của bạn (#${orderId}) đã chuyển sang trạng thái: ${status}`,
+      },
+      data: {
+        orderId,
+        status,
+      },
+    };
+
+    // Gửi thông báo qua FCM
+    //const response = await admin.messaging().send(message);
+  //  console.log("Notification sent successfully:", response);
+  } catch (error) {
+    console.error("Error sending notification:", error);
+  }
+};
+//ham xu li dong goi va gui thong bao cho khach hang
+//gui thong bao vao app khach hang
 
   const columns = [
     { title: "Name", key: "displayName", dataIndex: "displayName" },

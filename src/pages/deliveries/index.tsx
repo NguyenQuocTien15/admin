@@ -12,6 +12,8 @@ import {
   query,
   updateDoc,
   where,
+  addDoc,
+  serverTimestamp
 } from "firebase/firestore";
 
 import { useRouter } from "next/router";
@@ -110,6 +112,8 @@ const NewOrders = ({}) => {
   useEffect(() => {
     fetchOrders();
   }, []);
+
+  //ham xu li xac nhan don hang
  const handleConfirmNewOrder = async (orderId: string) => {
    try {
      const orderRef = doc(fs, "orders", orderId); 
@@ -124,6 +128,9 @@ const NewOrders = ({}) => {
      console.error("Error updating order status:", error);
    }
  }; 
+ //ham xu li xac nhan don hang
+
+//ham xu li xac huy don hang
  const handleDeleteOrder = async( orderId: string)=>{
   try {
     const orderRef = doc(fs, 'orders', orderId)
@@ -133,6 +140,105 @@ const NewOrders = ({}) => {
     console.error("Error delete order status:", error);
   }
  }
+//ham xu li huy don hang
+
+//them thong bao don hang dang chuan bi vao bang notifications
+  const addNotification = async (
+    userId: string,
+    orderId: string,
+    status: string
+  ) => {
+    try {
+      await addDoc(collection(fs, "notifications"), {
+        userId,
+        orderId,
+        title: "Trạng thái đơn hàng",
+        body: `Đơn hàng của bạn (#${orderId}) đã chuyển sang trạng thái: ${status}`,
+        status,
+        createdAt: serverTimestamp(),
+      });
+    } catch (error) {
+      console.error("Error adding notification:", error);
+    }
+  };
+  //thong bao don hang dang chuan bi
+ //gui thong bao vao app khach hang  // Hàm gửi thông báo FCM
+ const sendNotification = async (
+  userId: string,
+  orderId: string,
+  status: string
+) => {
+  try {
+    const userDoc = await getDoc(doc(fs, "users", userId));
+    if (!userDoc.exists()) {
+      console.error("User not found");
+      return;
+    }
+
+    const userData = userDoc.data();
+    const fcmToken = userData?.fcmToken; // Đảm bảo token được lưu khi user đăng nhập
+
+    if (!fcmToken) {
+      console.error("FCM token not found for user:", userId);
+      return;
+    }
+
+    // Tạo payload thông báo
+    const message = {
+      token: fcmToken,
+      notification: {
+        title: "Trạng thái đơn hàng",
+        body: `Đơn hàng của bạn (#${orderId}) đã chuyển sang trạng thái: ${status}`,
+      },
+      data: {
+        orderId,
+        status,
+      },
+    };
+
+    // Gửi thông báo qua FCM
+    //const response = await admin.messaging().send(message);
+  //  console.log("Notification sent successfully:", response);
+  } catch (error) {
+    console.error("Error sending notification:", error);
+  }
+};
+//gui thong bao vao app khach hang
+
+
+
+//ham xu li xac nhan va gui thong bao cho khach hang
+const handleConfirmOrderWithNotification = async (
+  orderId: string,
+  userId: string
+) => {
+  try {
+    //@ts-ignore
+    await handleConfirmNewOrder(orderId);
+    await addNotification(userId, orderId, "Đã xác nhận và đang chuẩn bị");
+    await sendNotification(userId, orderId, "Đã xác nhận và đang chuẩn bị");
+   
+  } catch (error) {
+    console.error("Error handling order and notification:", error);
+  }
+};
+//ham xu li xac nhan va gui thong bao cho khach hang
+//ham xu li huy don va gui thong bao cho khach hang
+const handleDeleteOrderWithNotification = async (
+  orderId: string,
+  userId: string
+) => {
+  try {
+    //@ts-ignore
+    await handleDeleteOrder(orderId);
+    await addNotification(userId, orderId, "Đã hủy đơn");
+    await sendNotification(userId, orderId, "Đã hủy đơn");
+   
+  } catch (error) {
+    console.error("Error handling order and notification:", error);
+  }
+};
+//ham xu li huy don va gui thong bao cho khach hang
 
   const columns = [
     { title: "Name", key: "displayName", dataIndex: "displayName" },
@@ -180,20 +286,20 @@ const NewOrders = ({}) => {
       title: "Action",
       dataIndex: "id",
 
-      render: (id: string) => (
+      render: (_: any,record:string) => (
         <Space>
           <Tooltip title="Cancel">
             <Button
-              key={id}
+              key={record.id}
               icon={<BiTrash size={25} style={{ color: "red" }} />}
-              onClick={() => handleDeleteOrder(id)}
+              onClick={() => handleDeleteOrderWithNotification(record.id, record.userId)}
             ></Button>
           </Tooltip>
           <Tooltip title="Confirm">
             <Button
-              key={id}
+              key={record.id}
               icon={<FaCheck size={25} style={{ color: "green" }} />}
-              onClick={() => handleConfirmNewOrder(id)}
+              onClick={() => handleConfirmOrderWithNotification(record.id, record.userId)}
             ></Button>
           </Tooltip>
         </Space>
